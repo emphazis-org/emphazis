@@ -5,7 +5,7 @@
 pkg_deps <- c("shiny", "shinycssloaders", "shinythemes")
 for (pkg_name in pkg_deps) {
   if (!(base::requireNamespace(pkg_name, quietly = TRUE))) {
-    utils::install.packages(pkg_name, repos = )
+    utils::install.packages(pkg_name, repos = "https://packagemanager.rstudio.com/all/latest")
   }
 }
 
