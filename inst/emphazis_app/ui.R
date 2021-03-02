@@ -4,14 +4,13 @@
 
 pkg_deps <- c("shiny", "shinycssloaders", "shinythemes")
 for (pkg_name in pkg_deps) {
-  if (!(base::requireNamespace(pkg_name, quietly = TRUE))) {
-    utils::install.packages(pkg_name, repos = "https://packagemanager.rstudio.com/all/latest")
-  }
+ if (!(base::requireNamespace(pkg_name, quietly = TRUE))) {
+   utils::install.packages(pkg_name, repos = "https://packagemanager.rstudio.com/all/latest")
+ }
 }
 
 # TODO remove shiny invocation
 require(shiny, quietly = TRUE)
-# if (base::requireNamespace(package_name, quietly = TRUE))
 
 # Main NavBar ----
 # TODO replace it with `withr::local_option`
@@ -23,7 +22,7 @@ ui <-  shiny::navbarPage(
 
   ### WELCOME PAGE ----
   shiny::tabPanel("Welcome",
-    # JS code for ggplot plot resize
+    # JS code for ggplot plot re-size
     shiny::tags$head(
       shiny::tags$script(
         '$(document).on("shiny:connected", function(e) {
@@ -40,7 +39,9 @@ ui <-  shiny::navbarPage(
       shiny::column(
         9,
         shiny::wellPanel(
-          shiny::tags$h1("EMPHAZIS: tracking movement ...", align = "center"),
+          shiny::tags$div(
+            shiny::tags$h1("EMPHAZIS: tracking movement ...", align = "center")
+          ),
           shiny::tags$br(),
           shiny::tags$h4("EMPHAZIS description"),
           shiny::tags$br() #,
@@ -50,6 +51,8 @@ ui <-  shiny::navbarPage(
       )
     )
   ),
+
+  # Upload panel ------------------------------------------------
   shiny::tabPanel(
     title = "Upload files",
     shiny::sidebarLayout(
@@ -77,7 +80,6 @@ ui <-  shiny::navbarPage(
           multiple = FALSE,
           accept = c("image/*")
         ),
-        # Horizontal line ----
         shiny::tags$hr(),
         # Background image input
         shiny::fileInput(
@@ -89,11 +91,14 @@ ui <-  shiny::navbarPage(
 
       # Main panel for image inputs
       mainPanel = shiny::mainPanel(
+        shiny::textOutput("video_description"),
         shiny::imageOutput("subject"),
         shiny::imageOutput("background")
       )
     )
   ),
+
+  # Analysis Panel -------------------------------------------------------
   shiny::tabPanel(
     title = "Analysis",
     shiny::sidebarLayout(
@@ -111,17 +116,40 @@ ui <-  shiny::navbarPage(
         shiny::actionButton(
           "start_job", "Click to start!"
         ),
-        shiny::tags$hr(),
-        # Slider to change frame
+        shiny::tags$hr()
+      ),
+      mainPanel = shiny::mainPanel(
+        shiny::dataTableOutput("analysis_summary")
+      )
+    )
+  ),
+
+  # 2D plots panel ------------------------------------------------------
+  shiny::tabPanel(
+    title = "Plots",
+    shiny::sidebarLayout(
+      sidebarPanel = shiny::sidebarPanel(
+        width = 3,
+        shiny::tags$h3(
+          shiny::tags$em(
+            shiny::tags$strong(
+              "Plot parameters"
+            )
+          )
+        ),
+        shiny::tags$br(),
         shiny::sliderInput(
           inputId = "frame_range",
           label = shiny::tags$h3("Choose Frame:"),
-          min = 1, max = 270, value = c(0,270)
+          min = 1, max = 10, value = c(1, 10)
         )
       ),
       mainPanel = shiny::mainPanel(
         shiny::plotOutput(
           "plot_track"
+        ),
+        shiny::plotOutput(
+          "plot_track_heatmap"
         ),
         shiny::plotOutput(
           "plot_dist"
@@ -130,9 +158,36 @@ ui <-  shiny::navbarPage(
           "plot_speed"
         )
       )
-    ),
+    )
   ),
-  ### Quit button ----
+
+  # 3D plots panel ------------------------------------------------------
+  shiny::tabPanel(
+    title = "3D-Plots",
+    shiny::sidebarLayout(
+      sidebarPanel = shiny::sidebarPanel(
+        width = 3,
+        shiny::tags$h3(
+          shiny::tags$em(
+            shiny::tags$strong(
+              "Plot parameters"
+            )
+          )
+        ),
+        shiny::tags$br()
+      ),
+      mainPanel = shiny::mainPanel(
+        plotly::plotlyOutput(
+          "plot_3d_dots"
+        ),
+        plotly::plotlyOutput(
+          "plot_3d_lines"
+        )
+      )
+    )
+  ),
+
+  # Quit button ---------------------------------------------------------
   shiny::navbarMenu(
     "Quit",
     shiny::tabPanel(

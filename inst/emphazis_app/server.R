@@ -10,9 +10,43 @@ server <- function(input, output, session) {
   ### initial values, needed for reactivity ####
   react_values <- shiny::reactiveValues()
 
-  # Upload files pane ---------------------------------------------
+  react_values$subject_model <- NULL
+  react_values$frames_output <- NULL
+  react_values$path_table <- NULL
+  react_values$dist_table <- NULL
+
+  # react_values$slider_min <- 0
+  # react_values$slider_max <- 10
+
+  # Update Interface based on inputs ------------------------------------------
+
+  # shiny::observeEvent(input$start_job, {
+  #   max_slider_value <- length(
+  #     unique(dplyr::pull(react_values$dist_table, "frame"))
+  #   )
+
+  #   shiny::updateSliderInput(
+  #     inputId = "frame_range",
+  #     max = max_slider_value,
+  #     value = c(1, max_slider_value)
+  #   )
+  # })
+
+
+
+  # Upload files pane --------------------------------------------------------
   # Print input images
+
+  output$video_description <- shiny::renderText({
+    shiny::req(input$input_video)
+
+    file <- input$input_video
+    file_path <- file$datapath
+    file_path
+  })
+
   output$subject <- shiny::renderImage({
+    shiny::req(input$input_subject)
 
     file <- input$input_subject
     file_path <- file$datapath
@@ -24,8 +58,11 @@ server <- function(input, output, session) {
       height = 100,
       alt = "Subject image"
     )
-  })
+  }, deleteFile = TRUE
+  )
+
   output$background <- shiny::renderImage({
+    shiny::req(input$input_bg)
 
     file <- input$input_bg
     file_path <- file$datapath
@@ -37,10 +74,21 @@ server <- function(input, output, session) {
       height = 300,
       alt = "Background image"
     )
-  })
-  # Analysis pane ---------------------------------------------
+  },  deleteFile = TRUE
+)
+
+  # Analysis pane -------------------------------------------------------------
 
   shiny::observeEvent(input$start_job, {
+
+    shiny::req(
+      input$input_video,
+      input$input_subject,
+      input$input_bg
+    )
+
+    message("Start analysis")
+
     react_values$subject_model <- emphazis::generate_subject_model(
       subject_path = fs::path_package("emphazis", "extdata", "subject.jpg"),
       background_path = fs::path_package("emphazis", "extdata", "background.jpg")
@@ -55,12 +103,27 @@ server <- function(input, output, session) {
       coord2 = c(475, 20)
     )
 
+    message("Mid analysis")
+
     react_values$dist_table <- emphazis::calculate_distances(react_values$frames_output)
     react_values$path_table <- emphazis::prepare_path_data(react_values$frames_output)
+
+    message("Finished analysis")
+
   })
 
-  # Plots pane ------------------------------------------------
+  output$analysis_summary <- shiny::renderDataTable({
+    head(datasets::iris)
+  })
+
+  # Plots pane -----------------------------------------------------------------
   output$plot_track <- shiny::renderPlot({
+
+    shiny::req(
+      react_values$path_table,
+      react_values$dist_table
+    )
+
     emphazis::plot_track(
       path_table = react_values$path_table,
       dist_table = react_values$dist_table,
@@ -68,7 +131,24 @@ server <- function(input, output, session) {
     )
   })
 
+  output$plot_track_heatmap <- shiny::renderPlot({
+
+    shiny::req(
+      react_values$path_table,
+      react_values$dist_table
+    )
+
+    emphazis::plot_track_heatmap(
+      path_table = react_values$path_table,
+      dist_table = react_values$dist_table,
+      range = input$frame_range
+    )
+  })
+
   output$plot_dist <- shiny::renderPlot({
+
+    shiny::req(react_values$dist_table)
+
     emphazis::plot_cumulative_distance(
       dist_table = react_values$dist_table,
       range = input$frame_range
@@ -76,10 +156,26 @@ server <- function(input, output, session) {
   })
 
   output$plot_speed <- shiny::renderPlot({
+
+    shiny::req(react_values$dist_table)
+
     emphazis::plot_average_speed(
       dist_table = react_values$dist_table,
       range = input$frame_range
     )
+  })
+
+  # 3d Plots pane --------------------------------------------------------------
+  output$plot_3d_dots <- plotly::renderPlotly({
+    shiny::req(react_values$dist_table)
+
+    emphazis::plot_3d_dots(dist_table = react_values$dist_table)
+  })
+
+  output$plot_3d_lines <- plotly::renderPlotly({
+    shiny::req(react_values$dist_table)
+
+    emphazis::plot_3d_lines(dist_table = react_values$dist_table)
   })
 
 }
