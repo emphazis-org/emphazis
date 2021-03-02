@@ -66,6 +66,7 @@ plot_track <- function(path_table, dist_table, color_var = "red", range = NULL) 
     ggplot2::coord_fixed() +
     ggplot2::scale_y_continuous(expand = c(0, 0)) +
     ggplot2::theme(legend.position = "none")
+
   return(plot_res)
 }
 
