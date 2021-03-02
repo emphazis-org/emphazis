@@ -6,7 +6,7 @@ Author: Who wrote it
 Maintainer: Lucio Rezende Queiroz <luciorqueiroz@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: xxx
+License: AGPL (>= 3)
 biocViews:
 Imports: 
     av,
