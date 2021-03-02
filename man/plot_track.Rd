@@ -4,7 +4,7 @@
 \alias{plot_track}
 \title{Plot tracking path}
 \usage{
-plot_track(path_table, dist_table, range = NULL)
+plot_track(path_table, dist_table, color_var = "red", range = NULL)
 }
 \description{
 Plot tracking path

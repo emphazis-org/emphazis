@@ -19,17 +19,16 @@ generate_subject_model <- function(subject_path, background_path) {
     c(subject_image@.Data[, , 3])
   )
 
-  seq_len(10)
   bg_mat <- bg_mat[sample(seq_len(nrow(bg_mat))), ]
   subject_mat <- subject_mat[sample(seq_len(nrow(subject_mat))), ]
 
   Mat <- rbind(cbind(bg_mat[1:500, ], 0), cbind(subject_mat[1:500, ], 1))
   colnames(Mat) <- c("R", "G", "B", "Y")
 
-  subject_model <- suppressWarnings({
+  subject_model <- base::suppressWarnings({
     stats::glm(
       formula = Y ~ R * G * B,
-      data = data.frame(Mat),
+      data = base::data.frame(Mat),
       family = stats::binomial()
     )
   })
@@ -77,7 +76,7 @@ proccess_video <- function(
     )
     colnames(matIm2) <- c("R", "G", "B")
     Pred <- round(stats::predict(
-      subject_model, data.frame(matIm2),
+      subject_model, base::data.frame(matIm2),
       type = "response"
     ), 0)
     imM <- matrix(Pred, ncol = ncol(im2@.Data))
