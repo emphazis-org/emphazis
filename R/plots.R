@@ -36,7 +36,7 @@ plot_average_speed <- function(dist_table, range = NULL) {
 
   dist_table %>%
     ggplot2::ggplot() +
-    ggplot2::geom_line(ggplot2::aes(x = time, y = mov_avg_speed)) +
+    ggplot2::geom_smooth(ggplot2::aes(x = time, y = mov_avg_speed)) +
     ggplot2::geom_point(ggplot2::aes(x = time, y = mov_avg_speed)) +
     ggplot2::expand_limits(x = c(begin_x_axis, end_x_axis)) +
     ggplot2::scale_y_continuous(expand = c(0, 0)) +
