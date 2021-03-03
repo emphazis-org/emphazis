@@ -92,8 +92,10 @@ ui <-  shiny::navbarPage(
       # Main panel for image inputs
       mainPanel = shiny::mainPanel(
         shiny::textOutput("video_description"),
-        shiny::imageOutput("subject"),
-        shiny::imageOutput("background")
+        shiny::tags$div(
+          shiny::imageOutput("subject"),
+          shiny::imageOutput("background")
+        )
       )
     )
   ),
@@ -142,7 +144,13 @@ ui <-  shiny::navbarPage(
           inputId = "frame_range",
           label = shiny::tags$h3("Choose Frame:"),
           min = 1, max = 10, value = c(1, 10)
-        )
+        ),
+        shiny::tags$br(),
+        # Button to start
+        shiny::actionButton(
+          "update_slider", "Update slider"
+        ),
+        shiny::tags$hr()
       ),
       mainPanel = shiny::mainPanel(
         shiny::plotOutput(

@@ -20,17 +20,18 @@ server <- function(input, output, session) {
 
   # Update Interface based on inputs ------------------------------------------
 
-  # shiny::observeEvent(input$start_job, {
-  #   max_slider_value <- length(
-  #     unique(dplyr::pull(react_values$dist_table, "frame"))
-  #   )
-
-  #   shiny::updateSliderInput(
-  #     inputId = "frame_range",
-  #     max = max_slider_value,
-  #     value = c(1, max_slider_value)
-  #   )
-  # })
+  shiny::observeEvent(input$update_slider, {
+    if (!is.null(react_values$dist_table)) {
+      max_slider_value <- length(
+        unique(dplyr::pull(react_values$dist_table, "frame"))
+      )
+      shiny::updateSliderInput(
+        inputId = "frame_range",
+        max = max_slider_value,
+        value = c(1, max_slider_value)
+      )
+    }
+  })
 
 
 
@@ -58,7 +59,7 @@ server <- function(input, output, session) {
       height = 100,
       alt = "Subject image"
     )
-  }, deleteFile = TRUE
+  }, deleteFile = FALSE
   )
 
   output$background <- shiny::renderImage({
@@ -74,7 +75,7 @@ server <- function(input, output, session) {
       height = 300,
       alt = "Background image"
     )
-  },  deleteFile = TRUE
+  },  deleteFile = FALSE
 )
 
   # Analysis pane -------------------------------------------------------------
@@ -89,11 +90,17 @@ server <- function(input, output, session) {
 
     message("Start analysis")
 
+    fs::file_exists(input$input_subject$datapath)
+    fs::file_exists(input$input_bg$datapath)
+    fs::file_exists(input$input_video$datapath)
+
     react_values$subject_model <- emphazis::generate_subject_model(
-      subject_path = fs::path_package("emphazis", "extdata", "subject.jpg"),
-      background_path = fs::path_package("emphazis", "extdata", "background.jpg")
+      subject_path = input$input_subject$datapath,
+      background_path = input$input_bg$datapath
     )
-    video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
+
+    video_path <- input$input_video$datapath
+
     temp_frames_path <- fs::path_temp("frames")
     react_values$frames_output <- emphazis::proccess_video(
       video_path = video_path,
@@ -113,7 +120,10 @@ server <- function(input, output, session) {
   })
 
   output$analysis_summary <- shiny::renderDataTable({
-    head(datasets::iris)
+
+    shiny::req(react_values$dist_table)
+
+    react_values$dist_table
   })
 
   # Plots pane -----------------------------------------------------------------
