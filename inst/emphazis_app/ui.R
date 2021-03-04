@@ -21,6 +21,8 @@ for (pkg_name in pkg_deps) {
 # TODO remove shiny invocation
 require(shiny, quietly = TRUE)
 
+`%>%` <- dplyr::`%>%`
+
 # Main NavBar ----
 # TODO replace it with `withr::local_option`
 base::options(spinner.size = 1, spinner.type = 5)
@@ -30,21 +32,19 @@ ui <-  shiny::navbarPage(
   theme = shinythemes::shinytheme("flatly"),
 
   ### WELCOME PAGE ----
-  shiny::tabPanel("Welcome",
-
+  shiny::tabPanel(
+    title = "Welcome",
 
     shiny::tags$head(
-
       # HTML <meta> tag
       metathis::meta() %>%
         metathis::meta_social(
           title = "EmphaZis",
-          description = "Zebrafish made simple",
+          description = "Zebrafish tracking made simple",
           url = "http://www.emphazis.org",
           image = "https://raw.githubusercontent.com/emphazis-org/emphazis/main/inst/emphazis_app/www/logo-emphazis.png",
           image_alt = "EmphaZis"
         ),
-
 
       ## TODO prepare GA_TOKEN to be added to HTML file only when not on CI/CD
       # Google Analytics
@@ -83,15 +83,15 @@ ui <-  shiny::navbarPage(
           # shiny::tags$div(
           #   shiny::tags$h1("EmphaZis: tracking movement ...", align = "center")
           # ),
-          shiny::tags$br(),
-          shiny::tags$h4(
-            shiny::tags$em(
-              shiny::tags$strong(
-                "Effects of marine pharmaceuticals in Zebrafish and ZFL cell line.",
-                align = "center"
-              )
-            )
-          ),
+          # shiny::tags$br(),
+          # shiny::tags$h4(
+          #   shiny::tags$em(
+          #     shiny::tags$strong(
+          #       "Effects of marine pharmaceuticals in Zebrafish and ZFL cell line.",
+          #       align = "center"
+          #     )
+          #   )
+          # ),
 
           shiny::tags$br(),
           shiny::tags$div(
