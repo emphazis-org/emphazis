@@ -2,7 +2,12 @@
 #  install.packages("emphazis"); require(emphazis, quietly=TRUE)
 #}
 
-pkg_deps <- c("shiny", "shinycssloaders", "shinythemes")
+pkg_deps <- c(
+  "shiny",
+  "shinycssloaders",
+  "shinythemes",
+  "metathis"
+)
 for (pkg_name in pkg_deps) {
  if (!(base::requireNamespace(pkg_name, quietly = TRUE))) {
    utils::install.packages(pkg_name, repos = "https://packagemanager.rstudio.com/all/latest")
@@ -17,13 +22,33 @@ require(shiny, quietly = TRUE)
 base::options(spinner.size = 1, spinner.type = 5)
 
 ui <-  shiny::navbarPage(
-  title = "(EMPHAZIS)",
+  title = "EmphaZis",
   theme = shinythemes::shinytheme("flatly"),
 
   ### WELCOME PAGE ----
   shiny::tabPanel("Welcome",
-    # JS code for ggplot plot re-size
+
+    # html head tag
     shiny::tags$head(
+
+      ## TODO prepare GA_TOKEN to be added to HTML file only when not on CI/CD
+      # Google Analytics
+      {
+        if (isTRUE(Sys.getenv("GA_TOKEN") != "")) {
+          ga_file_path <- "google-analytics.html"
+          if (fs::file_exists(ga_file_path)) {
+            shiny::includeHTML(ga_file_path)
+          }
+        }
+      },
+
+      # Add website favicon
+      shiny::tags$link(rel = "icon", href = "icons/logo.png"),
+
+      # HTML meta tags
+
+
+      # JS code for ggplot plot re-size
       shiny::tags$script(
         '$(document).on("shiny:connected", function(e) {
         Shiny.onInputChange("innerWidth", window.innerWidth);
@@ -39,14 +64,44 @@ ui <-  shiny::navbarPage(
       shiny::column(
         9,
         shiny::wellPanel(
+          shiny::tags$h1("EmphaZis", align = "center"),
+          # shiny::tags$div(
+          #   shiny::tags$h1("EmphaZis: tracking movement ...", align = "center")
+          # ),
+          shiny::tags$br(),
+          shiny::tags$h4(
+            shiny::tags$em(
+              shiny::tags$strong(
+                "Effects of marine pharmaceuticals in Zebrafish and ZFL cell line.",
+                align = "center"
+              )
+            )
+          ),
+
+          shiny::tags$br(),
           shiny::tags$div(
-            shiny::tags$h1("EMPHAZIS: tracking movement ...", align = "center")
+            shiny::tags$img(src = "logo-emphazis.png"),
+            style = "text-align: center;"
           ),
           shiny::tags$br(),
-          shiny::tags$h4("EMPHAZIS description"),
-          shiny::tags$br() #,
-          # TODO add logo here
-          # div()
+          shiny::tags$h2("Motivation"),
+
+          shiny::tags$br(),
+          shiny::tags$p(
+            "This web application was developed to meet the needs of the FAPESP ", shiny::tags$em("Emphasis"), " project, which aims to evaluate the effects of pharmaceuticals of marine origin in Zebrafish and ZFL cell line."
+          ),
+          shiny::tags$br(),
+          shiny::tags$p(
+            "Multidisciplinarity in Science. Team work."
+          ),
+          shiny::tags$br(),
+          shiny::tags$p(
+            "Science advances when it embraces different areas in a common goal."
+          ),
+          shiny::tags$br(),
+
+          shiny::tags$p("This work is supported by FAPESP"),
+          shiny::tags$p("Grant number: 18/07098-0")
         )
       )
     )
@@ -187,6 +242,9 @@ ui <-  shiny::navbarPage(
       mainPanel = shiny::mainPanel(
         plotly::plotlyOutput(
           "plot_3d_dots"
+        ),
+        plotly::plotlyOutput(
+          "plot_3d_surface"
         ),
         plotly::plotlyOutput(
           "plot_3d_lines"

@@ -123,7 +123,8 @@ server <- function(input, output, session) {
 
     shiny::req(react_values$dist_table)
 
-    react_values$dist_table
+    head(react_values$dist_table)
+
   })
 
   # Plots pane -----------------------------------------------------------------
@@ -179,13 +180,25 @@ server <- function(input, output, session) {
   output$plot_3d_dots <- plotly::renderPlotly({
     shiny::req(react_values$dist_table)
 
-    emphazis::plot_3d_dots(dist_table = react_values$dist_table)
+    emphazis::plot_3d_dots(
+      dist_table = react_values$dist_table,
+      size = 3
+    )
+
   })
 
   output$plot_3d_lines <- plotly::renderPlotly({
     shiny::req(react_values$dist_table)
 
     emphazis::plot_3d_lines(dist_table = react_values$dist_table)
+
+  })
+
+  output$plot_3d_surface <- plotly::renderPlotly({
+    shiny::req(react_values$dist_table)
+
+    emphazis::plot_3d_surface(dist_table = react_values$dist_table)
+
   })
 
 }
