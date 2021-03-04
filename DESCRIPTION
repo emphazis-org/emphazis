@@ -1,12 +1,12 @@
 Type: Package
 Package: emphazis
 Title: Emphazis
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Author: Who wrote it
 Maintainer: Lucio Rezende Queiroz <luciorqueiroz@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: AGPL (>= 3)
+License:
 biocViews:
 Imports: 
     av,
@@ -20,7 +20,9 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    plotly
+    plotly,
+    MASS,
+    rlang
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
