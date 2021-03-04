@@ -8,9 +8,13 @@ pkg_deps <- c(
   "shinythemes",
   "metathis"
 )
+
 for (pkg_name in pkg_deps) {
  if (!(base::requireNamespace(pkg_name, quietly = TRUE))) {
-   utils::install.packages(pkg_name, repos = "https://packagemanager.rstudio.com/all/latest")
+    utils::install.packages(
+      pkg_name,
+      repos = "https://packagemanager.rstudio.com/all/latest"
+    )
  }
 }
 
@@ -28,8 +32,19 @@ ui <-  shiny::navbarPage(
   ### WELCOME PAGE ----
   shiny::tabPanel("Welcome",
 
-    # html head tag
+
     shiny::tags$head(
+
+      # HTML <meta> tag
+      metathis::meta() %>%
+        metathis::meta_social(
+          title = "EmphaZis",
+          description = "Zebrafish made simple",
+          url = "http://www.emphazis.org",
+          image = "https://raw.githubusercontent.com/emphazis-org/emphazis/main/inst/emphazis_app/www/logo-emphazis.png",
+          image_alt = "EmphaZis"
+        ),
+
 
       ## TODO prepare GA_TOKEN to be added to HTML file only when not on CI/CD
       # Google Analytics
