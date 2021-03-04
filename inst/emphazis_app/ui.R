@@ -41,7 +41,7 @@ ui <-  shiny::navbarPage(
         metathis::meta_social(
           title = "EmphaZis",
           description = "Zebrafish tracking made simple",
-          url = "http://www.emphazis.org",
+          url = "https://www.emphazis.org",
           image = "https://raw.githubusercontent.com/emphazis-org/emphazis/main/inst/emphazis_app/www/logo-emphazis.png",
           image_alt = "EmphaZis"
         ),
