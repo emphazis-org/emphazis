@@ -2,10 +2,10 @@
 % Please edit documentation in R/plots_3d.R
 \name{plot_3d_lines}
 \alias{plot_3d_lines}
-\title{Plot 3d Track}
+\title{Plot 3d Track Lines}
 \usage{
 plot_3d_lines(dist_table)
 }
 \description{
-Plot 3d Track
+Plot 3d Track Lines
 }
