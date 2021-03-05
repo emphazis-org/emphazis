@@ -58,7 +58,7 @@ plot_average_speed <- function(dist_table, range = NULL) {
 #' Plot tracking path
 #' @export
 plot_track <- function(
-  path_table, dist_table, color_var = "purple", range = NULL
+  path_table, dist_table, color = "purple", range = NULL
 ) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
@@ -78,7 +78,7 @@ plot_track <- function(
         y = .data[["y_center"]]
       ),
     ) +
-    ggplot2::geom_path(color = color_var) +
+    ggplot2::geom_path(color = color) +
     ggplot2::theme_bw() +
     ggplot2::coord_fixed() +
     ggplot2::scale_y_continuous(expand = c(0, 0)) +

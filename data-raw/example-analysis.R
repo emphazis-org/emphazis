@@ -27,7 +27,7 @@ frame_range <- c(0, length(unique(dplyr::pull(dist_table, "frame"))))
 p1 <- plot_track(
   path_table = path_table,
   dist_table = dist_table,
-  color_var = "green",
+  color = "green",
   range = frame_range
 )
 
