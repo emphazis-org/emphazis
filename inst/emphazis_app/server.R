@@ -1,15 +1,22 @@
 # Define server logic ----
-server <- function(input, output, session) {
+server <- function(
+  input,
+  output,
+  session
+) {
 
   ## stop the R session
   session$onSessionEnded(stopApp)
   ##
   ## To increase file upload max size
-  base::options(shiny.maxRequestSize = 200*1024^2)
+  # options(shiny.maxRequestSize = 900*1024^2) 90MB?
+  base::options(shiny.maxRequestSize = 2800 * 1024 ^ 2) # 350MB?
+
 
   ### initial values, needed for reactivity ####
   react_values <- shiny::reactiveValues()
 
+  # TODO remove path_table, it is not used
   react_values$subject_model <- NULL
   react_values$frames_output <- NULL
   react_values$path_table <- NULL
@@ -76,7 +83,8 @@ server <- function(input, output, session) {
       alt = "Background image"
     )
   },  deleteFile = FALSE
-)
+  )
+
 
   # Analysis pane -------------------------------------------------------------
 
@@ -94,6 +102,16 @@ server <- function(input, output, session) {
     fs::file_exists(input$input_bg$datapath)
     fs::file_exists(input$input_video$datapath)
 
+
+    coord_1 <- c(
+      input$arena_x_1,
+      input$arena_y_1
+    )
+
+    coord_2 <- c(
+      input$arena_x_2,
+      input$arena_y_2
+    )
     react_values$subject_model <- emphazis::generate_subject_model(
       subject_path = input$input_subject$datapath,
       background_path = input$input_bg$datapath
@@ -106,8 +124,8 @@ server <- function(input, output, session) {
       video_path = video_path,
       frames_path = temp_frames_path,
       subject_model = react_values$subject_model,
-      coord1 = c(285, 655),
-      coord2 = c(475, 20)
+      coord1 = coord_1,
+      coord2 = coord_2
     )
 
     message("Mid analysis")
@@ -119,7 +137,7 @@ server <- function(input, output, session) {
 
   })
 
-  output$analysis_summary <- shiny::renderDataTable({
+  output$analysis_summary <- shiny::renderTable({
 
     shiny::req(react_values$dist_table)
 
@@ -138,6 +156,7 @@ server <- function(input, output, session) {
     emphazis::plot_track(
       path_table = react_values$path_table,
       dist_table = react_values$dist_table,
+      color = input$color_subject_1,
       range = input$frame_range
     )
   })
