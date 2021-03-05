@@ -16,22 +16,23 @@ testthat::test_that("Process video", {
       frames_path = temp_frames_path,
       subject_model = model_test,
       coord1 = c(285, 655),
-      coord2 = c(475, 20)
+      coord2 = c(475, 20),
+      fps = 3
     )
   })
-  testthat::expect_equal(length(x_test), length(fs::dir_ls(temp_frames_path)))
+  testthat::expect_equal(nrow(x_test), length(fs::dir_ls(temp_frames_path)))
 
-  testthat::expect_gt(x_test[[1]][[2]]$y_center, 100)
+  testthat::expect_gt(x_test$y_center[2], 100)
 
   dist_table <- calculate_distances(x_test)
 
   testthat::expect_equal(dist_table$mov_avg_speed[1], NA_integer_)
-  # testthat::expect_equal(nrow(dist_table), length(fs::dir_ls(temp_frames_path)))
+  testthat::expect_equal(nrow(dist_table), length(fs::dir_ls(temp_frames_path)))
 
-  path_table <- prepare_path_data(x_test)
+  y_test <- proccess_video(
+    video_path = video_path,
+    frames_path = temp_frames_path,
+    subject_model = model_test
+  )
 
-  # testthat::expect_equal(
-  #   length(unique(path_table$frame)),
-  #   length(fs::dir_ls(temp_frames_path))
-  # )
 })

@@ -9,17 +9,15 @@ server <- function(
   session$onSessionEnded(stopApp)
   ##
   ## To increase file upload max size
-  # options(shiny.maxRequestSize = 900*1024^2) 90MB?
-  base::options(shiny.maxRequestSize = 2800 * 1024 ^ 2) # 350MB?
+  # options(shiny.maxRequestSize = 900*1024^2) 900MB?
+  base::options(shiny.maxRequestSize = 900 * 1024 ^ 2)
 
 
   ### initial values, needed for reactivity ####
   react_values <- shiny::reactiveValues()
 
-  # TODO remove path_table, it is not used
   react_values$subject_model <- NULL
   react_values$frames_output <- NULL
-  react_values$path_table <- NULL
   react_values$dist_table <- NULL
 
   # react_values$slider_min <- 0
@@ -44,13 +42,16 @@ server <- function(
 
   # Upload files pane --------------------------------------------------------
   # Print input images
-
   output$video_description <- shiny::renderText({
     shiny::req(input$input_video)
 
     file <- input$input_video
-    file_path <- file$datapath
-    file_path
+
+    # TODO use av::av_media_info to extract info
+    video_details <- glue::glue(
+      "File type: {file$type}; File size: {(file$size / (1024^2))} MB;"
+    )
+    video_details
   })
 
   output$subject <- shiny::renderImage({
@@ -78,15 +79,62 @@ server <- function(
     list(
       src = file_path,
       contentType = "image/*",
-      with = 300,
+      width = 300,
       height = 300,
       alt = "Background image"
     )
   },  deleteFile = FALSE
   )
 
+  # Selection panel -----------------------------------------------------------
 
-  # Analysis pane -------------------------------------------------------------
+  observeEvent(input$run_video_process, {
+
+    shiny::req(input$input_video)
+
+    file.remove(
+      paste(tempdir(), list.files(tempdir(), pattern = ".jpg"), sep = "/")
+    )
+
+    video_path <- input$input_video$datapath
+
+    # Upload video
+    emphazis::video_to_image(
+      video_path = video_path, fps = input$fps_slider
+    )
+    frames <- list.files(tempdir(), pattern = ".jpg")
+
+    video_time <- av::av_media_info(video_path)$duration[1]
+
+    # progressr::withProgressShiny()
+
+
+    ######################### show Frame
+    output$input_first_frame <- shiny::renderImage({
+      shiny::req(input$input_video)
+
+      suppressWarnings(dir.create(tempdir()))
+      # A temp file to save the output.
+      # This file will be removed later by renderImage
+      file_names <- list.files(path = tempdir())
+
+      file_path <- paste(
+        tempdir(), file_names[round(length(file_names) / 2, 0)], sep = "\\"
+      )
+
+      list(
+        src = file_path,
+        contentType = "image/*",
+        width = 400,
+        # height = 400,
+        alt = "Image"
+      )
+    }, deleteFile = FALSE
+    )
+  })
+
+
+  # Analysis panel -------------------------------------------------------------
 
   shiny::observeEvent(input$start_job, {
 
@@ -120,18 +168,25 @@ server <- function(
     video_path <- input$input_video$datapath
 
     temp_frames_path <- fs::path_temp("frames")
-    react_values$frames_output <- emphazis::proccess_video(
-      video_path = video_path,
-      frames_path = temp_frames_path,
-      subject_model = react_values$subject_model,
-      coord1 = coord_1,
-      coord2 = coord_2
+    progressr::withProgressShiny(
+      message = "Calculation in progress",
+      detail = "This may take a while ...",
+      value = 0,
+      expr = {
+        react_values$frames_output <- emphazis::proccess_video(
+          video_path = video_path,
+          frames_path = temp_frames_path,
+          subject_model = react_values$subject_model,
+          coord1 = coord_1,
+          coord2 = coord_2
+        )
+      }
     )
+
 
     message("Mid analysis")
 
     react_values$dist_table <- emphazis::calculate_distances(react_values$frames_output)
-    react_values$path_table <- emphazis::prepare_path_data(react_values$frames_output)
 
     message("Finished analysis")
 
@@ -149,12 +204,10 @@ server <- function(
   output$plot_track <- shiny::renderPlot({
 
     shiny::req(
-      react_values$path_table,
       react_values$dist_table
     )
 
     emphazis::plot_track(
-      path_table = react_values$path_table,
       dist_table = react_values$dist_table,
       color = input$color_subject_1,
       range = input$frame_range
@@ -164,12 +217,10 @@ server <- function(
   output$plot_track_heatmap <- shiny::renderPlot({
 
     shiny::req(
-      react_values$path_table,
       react_values$dist_table
     )
 
     emphazis::plot_track_heatmap(
-      path_table = react_values$path_table,
       dist_table = react_values$dist_table,
       range = input$frame_range
     )

@@ -6,20 +6,25 @@
 \usage{
 proccess_video(
   video_path,
-  frames_path,
   subject_model,
-  coord1 = c(285, 655),
-  coord2 = c(475, 20)
+  frames_path,
+  coord1 = NULL,
+  coord2 = NULL,
+  fps = 5
 )
 }
 \arguments{
-\item{frames_path}{Path to save frames extracted from video.}
+\item{video_path}{Path to video file.}
 
 \item{subject_model}{model generated from `generate_subject_model()`.}
+
+\item{frames_path}{Path to save frames extracted from video.}
 
 \item{coord1}{length 2 vector with position of the top right point.}
 
 \item{coord2}{length 2 vector with position of the bottom left point.}
+
+\item{fps}{default = 5; Frames per second to decompose video.}
 }
 \description{
 Extract data and frames from video.

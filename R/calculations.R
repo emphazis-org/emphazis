@@ -2,13 +2,11 @@
 #' Calculate Distances
 #'
 #' Calculate distances and cumulative distances from frame to frame.
-#' @param res_list Output from video processing.
+#' @param res_df Output from video processing.
 #' @export
-calculate_distances <- function(res_list) {
+calculate_distances <- function(res_df) {
   `%>%` <- dplyr::`%>%`
-  res_df <- purrr::map_dfr(res_list, function(x) {
-    x[[2]]
-  })
+
   dist <- NULL
   for (i in 2:nrow(res_df)) {
     dist <- c(dist, sqrt(sum((res_df[i - 1, ] - res_df[i, ])^2)))
@@ -101,20 +99,4 @@ count_area_circle <- function(dist_table, diameter_px = 50) {
     return(area_count)
   })
   return(count_vector)
-}
-
-#' Prepare path data
-#'
-#' Prepare data for path plotting.
-#' @param res_list Output from video processing.
-#' @export
-prepare_path_data <- function(res_list) {
-  path_df <- purrr::map2_dfr(
-    .x = res_list,
-    .y = seq_along(res_list),
-    .f = function(res_list, frame_pos) {
-      dplyr::mutate(res_list[[1]], frame = {{frame_pos}})
-    }
-  )
-  return(path_df)
 }

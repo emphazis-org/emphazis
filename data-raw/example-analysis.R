@@ -19,20 +19,17 @@ frames_output <- proccess_video(
 
 # Summarize data
 dist_table <- calculate_distances(frames_output)
-path_table <- prepare_path_data(frames_output)
 
 frame_range <- c(0, length(unique(dplyr::pull(dist_table, "frame"))))
 
 # Plots
 p1 <- plot_track(
-  path_table = path_table,
   dist_table = dist_table,
   color = "green",
   range = frame_range
 )
 
 p2 <- plot_track_heatmap(
-  path_table = path_table,
   dist_table = dist_table,
   range = frame_range
 )

@@ -58,16 +58,13 @@ plot_average_speed <- function(dist_table, range = NULL) {
 #' Plot tracking path
 #' @export
 plot_track <- function(
-  path_table, dist_table, color = "purple", range = NULL
+  dist_table, color = "purple", range = NULL
 ) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
   if (!is.null(range)) {
     dist_table <- dist_table %>%
-      dplyr::filter(frame >= range[1] & frame <= range[2])
-
-    path_table <- path_table %>%
       dplyr::filter(frame >= range[1] & frame <= range[2])
   }
 
@@ -90,17 +87,15 @@ plot_track <- function(
 
 #' Plot tracking path density
 #' @export
-plot_track_heatmap <- function(path_table, dist_table, range = NULL) {
+plot_track_heatmap <- function(dist_table, range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
   if (!is.null(range)) {
     dist_table <- dist_table %>%
       dplyr::filter(frame >= range[1] & frame <= range[2])
-
-    path_table <- path_table %>%
-      dplyr::filter(frame >= range[1] & frame <= range[2])
   }
+
   plot_res <- dist_table %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(

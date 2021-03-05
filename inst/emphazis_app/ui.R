@@ -5,7 +5,6 @@
 pkg_deps <- c(
   "shiny",
   "shinythemes",
-  "shinyWidgets",
   "shinycssloaders",
   "metathis"
 )
@@ -80,7 +79,10 @@ ui <-  shiny::navbarPage(
       shiny::column(
         9,
         shiny::wellPanel(
-          shiny::tags$h1("EmphaZis", align = "center"),
+          shiny::tags$h1(
+            shiny::tags$p("Empha",shiny::tags$strong("Z"), "is"),
+            align = "center"
+          ),
 
           shiny::tags$br(),
           shiny::tags$div(
@@ -88,6 +90,9 @@ ui <-  shiny::navbarPage(
             style = "text-align: center;"
           ),
           shiny::tags$br(),
+          shiny::tags$hr(),
+          shiny::tags$br(),
+
           shiny::tags$h2("Motivation"),
 
           shiny::tags$br(),
@@ -120,7 +125,7 @@ ui <-  shiny::navbarPage(
         shiny::tags$h3(
           shiny::tags$em(
             shiny::tags$strong(
-              "Upload files"
+              "Upload video"
             )
           )
         ),
@@ -142,21 +147,40 @@ ui <-  shiny::navbarPage(
         shiny::actionButton(
           inputId = "run_video_process",
           label = "Decompose video",
-          icon =
+          icon = shiny::icon("film")
+        )
+      ),
+
+      # Main panel for image inputs
+      mainPanel = shiny::mainPanel(
+        shiny::tags$b("Video decomposition progress"),
+        shiny::tags$br(),
+        # shinyWidgets::progressBar(
+        #   id = "video_input_prog_bar",
+        #   value = 0, total = 100
+        # ),
+        shiny::imageOutput(
+          outputId = "input_first_frame"
         ),
-        # Fish image input
-        # shiny::fileInput(
-        #   "input_subject", "Choose Subject Image",
-        #   multiple = FALSE,
-        #   accept = c("image/*")
-        # ),
-        # shiny::tags$hr(),
-        # # Background image input
-        # shiny::fileInput(
-        #   "input_bg", "Choose Background Image",
-        #   multiple = FALSE,
-        #   accept = c("image/*")
-        # ),
+        shiny::textOutput(
+          outputId = "video_description"
+        ),
+      )
+    )
+  ),
+  # Frame selection panel ------------------------------------------------
+  shiny::tabPanel(
+    title = "Arena settings",
+    shiny::sidebarLayout(
+      sidebarPanel = shiny::sidebarPanel(
+        width = 3,
+        shiny::tags$h3(
+          shiny::tags$em(
+            shiny::tags$strong(
+              "Arena selection"
+            )
+          )
+        ),
         shiny::tags$hr(),
         shiny::tags$br(),
         shiny::sliderInput(
@@ -194,19 +218,8 @@ ui <-  shiny::navbarPage(
 
       # Main panel for image inputs
       mainPanel = shiny::mainPanel(
-        shiny::tags$b("Video decomposition progress"),
-        shiny::tags$br(),
-        shinyWidgets::progressBar(
-          id = "video_input_prog_bar",
-          value = 0, total = 100
-        ),
-        shiny::imageOutput(outputId = "input_first_frame"),
-        shiny::textOutput("video_description"),
+        shiny::tags$b("Selected arena"),
         shiny::imageOutput(outputId = "input_cut_frame")
-        # shiny::tags$div(
-        #   shiny::imageOutput("subject"),
-        #   shiny::imageOutput("background")
-        # )
       )
     )
   ),
@@ -217,6 +230,16 @@ ui <-  shiny::navbarPage(
     shiny::sidebarLayout(
       sidebarPanel = shiny::sidebarPanel(
         width = 3,
+
+        # shiny::tags$h3(
+        #   shiny::tags$em(
+        #     shiny::tags$strong(
+        #       "Color palette segmentation"
+        #     )
+        #   )
+        # ),
+        # shiny::tags$br(),
+
         shiny::tags$h3(
           shiny::tags$em(
             shiny::tags$strong(
@@ -231,7 +254,14 @@ ui <-  shiny::navbarPage(
         ),
         shiny::tags$hr()
       ),
+
       mainPanel = shiny::mainPanel(
+        shiny::tags$b("Video processing"),
+        #shiny::tags$br(),
+        # shinyWidgets::progressBar(
+        #   id = "analysis_prog_bar", value = 0, total = 100
+        # ),
+        shiny::tags$br(),
         shiny::tableOutput("analysis_summary")
       )
     )

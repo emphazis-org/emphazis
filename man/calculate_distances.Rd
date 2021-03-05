@@ -4,10 +4,10 @@
 \alias{calculate_distances}
 \title{Calculate Distances}
 \usage{
-calculate_distances(res_list)
+calculate_distances(res_df)
 }
 \arguments{
-\item{res_list}{Output from video processing.}
+\item{res_df}{Output from video processing.}
 }
 \description{
 Calculate distances and cumulative distances from frame to frame.
