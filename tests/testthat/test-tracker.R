@@ -10,14 +10,15 @@ testthat::test_that("Process video", {
   video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
   temp_frames_path <- fs::path_temp("frames")
 
-  x_test <- proccess_video(
-    video_path = video_path,
-    frames_path = temp_frames_path,
-    subject_model = model_test,
-    coord1 = c(285, 655),
-    coord2 = c(475, 20)
-  )
-
+  progressr::with_progress({
+    x_test <- proccess_video(
+      video_path = video_path,
+      frames_path = temp_frames_path,
+      subject_model = model_test,
+      coord1 = c(285, 655),
+      coord2 = c(475, 20)
+    )
+  })
   testthat::expect_equal(length(x_test), length(fs::dir_ls(temp_frames_path)))
 
   testthat::expect_gt(x_test[[1]][[2]]$y_center, 100)

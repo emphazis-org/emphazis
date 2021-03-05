@@ -1,40 +1,3 @@
-#' Generate subject model
-#'
-#' Generate subject model.
-#' @param subject_path Path to subject image.
-#' @param background_path Path to background image.
-#' @export
-generate_subject_model <- function(subject_path, background_path) {
-  bg_image <- EBImage::readImage(background_path)
-  subject_image <- EBImage::readImage(subject_path)
-
-  bg_mat <- cbind(
-    c(bg_image@.Data[, , 1]),
-    c(bg_image@.Data[, , 2]),
-    c(bg_image@.Data[, , 3])
-  )
-  subject_mat <- cbind(
-    c(subject_image@.Data[, , 1]),
-    c(subject_image@.Data[, , 2]),
-    c(subject_image@.Data[, , 3])
-  )
-
-  bg_mat <- bg_mat[sample(seq_len(nrow(bg_mat))), ]
-  subject_mat <- subject_mat[sample(seq_len(nrow(subject_mat))), ]
-
-  Mat <- rbind(cbind(bg_mat[1:500, ], 0), cbind(subject_mat[1:500, ], 1))
-  colnames(Mat) <- c("R", "G", "B", "Y")
-
-  subject_model <- base::suppressWarnings({
-    stats::glm(
-      formula = Y ~ R * G * B,
-      data = base::data.frame(Mat),
-      family = stats::binomial()
-    )
-  })
-  return(subject_model)
-}
-
 #' Extract data from video
 #'
 #' Extract data and frames from video.
@@ -45,8 +8,8 @@ generate_subject_model <- function(subject_path, background_path) {
 #' @export
 proccess_video <- function(
                            video_path, frames_path, subject_model,
-                           coord1 = c(285, 655),
-                           coord2 = c(475, 20)) {
+                           coord1 = NULL,
+                           coord2 = NULL) {
   `%>%` <- dplyr::`%>%`
   if (fs::dir_exists(frames_path)) {
     fs::dir_delete(frames_path)
@@ -57,13 +20,16 @@ proccess_video <- function(
   # base_names <- list.files(frames_path)
   im <- EBImage::readImage(frames_vector[1])
 
-  # TODO criar um slider no App para definir a area de corte da arena
   Coord1 <- coord1
+
   Coord2 <- coord2
 
   im2 <- im
   maat <- im@.Data[Coord1[1]:Coord1[2], Coord2[1]:Coord2[2], ]
   im2@.Data <- maat
+
+  # Progress bar count
+  prog_count <- progressr::progressor(along = frames_vector)
 
   # frame_path = frames_vector[2]
   extract_values <- function(frame_path) {
@@ -109,8 +75,13 @@ proccess_video <- function(
       frame_hull_temp,
       Res_temp
     )
+
+    # Progress counter
+    prog_count()
     return(temp_list)
   }
+
+
   res_list <- purrr::map(
     frames_vector,
     extract_values
