@@ -1,11 +1,12 @@
-# if (!(require(emphazis))) {
-#  install.packages("emphazis"); require(emphazis, quietly=TRUE)
+# if (!(base::requireNamespace(emphazis))) {
+#  install.packages("emphazis"); require(emphazis, quietly = TRUE)
 #}
 
 pkg_deps <- c(
   "shiny",
-  "shinycssloaders",
   "shinythemes",
+  "shinyWidgets",
+  "shinycssloaders",
   "metathis"
 )
 
@@ -80,18 +81,6 @@ ui <-  shiny::navbarPage(
         9,
         shiny::wellPanel(
           shiny::tags$h1("EmphaZis", align = "center"),
-          # shiny::tags$div(
-          #   shiny::tags$h1("EmphaZis: tracking movement ...", align = "center")
-          # ),
-          # shiny::tags$br(),
-          # shiny::tags$h4(
-          #   shiny::tags$em(
-          #     shiny::tags$strong(
-          #       "Effects of marine pharmaceuticals in Zebrafish and ZFL cell line.",
-          #       align = "center"
-          #     )
-          #   )
-          # ),
 
           shiny::tags$br(),
           shiny::tags$div(
@@ -144,28 +133,80 @@ ui <-  shiny::navbarPage(
         ),
         # Horizontal line ----
         shiny::tags$hr(),
-        # Fish image input
-        shiny::fileInput(
-          "input_subject", "Choose Subject Image",
-          multiple = FALSE,
-          accept = c("image/*")
+        shiny::sliderInput(
+          inputId = "fps_slider",
+          min = 1, max = 24, step = 1, round = T, value = 5,
+          label = "Choose Frames per Second"
         ),
+
+        shiny::actionButton(
+          inputId = "run_video_process",
+          label = "Decompose video",
+          icon =
+        ),
+        # Fish image input
+        # shiny::fileInput(
+        #   "input_subject", "Choose Subject Image",
+        #   multiple = FALSE,
+        #   accept = c("image/*")
+        # ),
+        # shiny::tags$hr(),
+        # # Background image input
+        # shiny::fileInput(
+        #   "input_bg", "Choose Background Image",
+        #   multiple = FALSE,
+        #   accept = c("image/*")
+        # ),
         shiny::tags$hr(),
-        # Background image input
-        shiny::fileInput(
-          "input_bg", "Choose Background Image",
-          multiple = FALSE,
-          accept = c("image/*")
+        shiny::tags$br(),
+        shiny::sliderInput(
+          inputId = "arena_x_1",
+          min = 1, max = 100, step = 1, round = T, value = 1,
+          label = "X1 Coord"
+        ),
+        shiny::sliderInput(
+          inputId = "arena_x_2",
+          min = 1, max = 100, step = 1, round = T, value = 100,
+          label = "X2 Coord"
+        ),
+        shiny::sliderInput(
+          inputId = "arena_y_1",
+          min = 1, max = 100, step = 1, round = T, value = 1,
+          label = "Y1 Coord"
+        ),
+        shiny::sliderInput(
+          inputId = "arena_y_2",
+          min = 1, max = 100, step = 1, round = T, value = 100,
+          label = "Y2 Coord"
+        ),
+        # actionButton("cut_frame_button","Apply slice"),
+        shiny::textInput(
+          inputId = "arena_width",
+          label = "Arena Width(mm)",
+          value = 1
+        ),
+        shiny::textInput(
+          inputId = "arena_length",
+          label = "Arena Length(mm)",
+          value = 1
         )
       ),
 
       # Main panel for image inputs
       mainPanel = shiny::mainPanel(
+        shiny::tags$b("Video decomposition progress"),
+        shiny::tags$br(),
+        shinyWidgets::progressBar(
+          id = "video_input_prog_bar",
+          value = 0, total = 100
+        ),
+        shiny::imageOutput(outputId = "input_first_frame"),
         shiny::textOutput("video_description"),
-        shiny::tags$div(
-          shiny::imageOutput("subject"),
-          shiny::imageOutput("background")
-        )
+        shiny::imageOutput(outputId = "input_cut_frame")
+        # shiny::tags$div(
+        #   shiny::imageOutput("subject"),
+        #   shiny::imageOutput("background")
+        # )
       )
     )
   ),
@@ -191,7 +232,7 @@ ui <-  shiny::navbarPage(
         shiny::tags$hr()
       ),
       mainPanel = shiny::mainPanel(
-        shiny::dataTableOutput("analysis_summary")
+        shiny::tableOutput("analysis_summary")
       )
     )
   ),
@@ -213,28 +254,47 @@ ui <-  shiny::navbarPage(
         shiny::sliderInput(
           inputId = "frame_range",
           label = shiny::tags$h3("Choose Frame:"),
-          min = 1, max = 10, value = c(1, 10)
+          min = 1, max = 100, value = c(1, 100)
         ),
         shiny::tags$br(),
         # Button to start
         shiny::actionButton(
           "update_slider", "Update slider"
         ),
-        shiny::tags$hr()
+        shiny::tags$hr(),
+        shiny::tags$br(),
+        colourpicker::colourInput(
+          inputId = "color_subject_1",
+          label = shiny::tags$h3("Select subject color"),
+          value = "purple"
+        ),
+        shiny::tags$br()
       ),
       mainPanel = shiny::mainPanel(
         shiny::plotOutput(
           "plot_track"
-        ),
+        ) %>%
+          shiny::tagAppendAttributes(
+            alt = "Tracking Plot of the arena"
+          ),
         shiny::plotOutput(
           "plot_track_heatmap"
-        ),
+        ) %>%
+          shiny::tagAppendAttributes(
+            alt = "Heatmap plot of the arena"
+          ),
         shiny::plotOutput(
           "plot_dist"
-        ),
+        ) %>%
+          shiny::tagAppendAttributes(
+            alt = "Plot of cumulative distance"
+          ),
         shiny::plotOutput(
           "plot_speed"
-        )
+        ) %>%
+          shiny::tagAppendAttributes(
+            alt = "Plot of rolling average speed by time"
+          )
       )
     )
   ),
