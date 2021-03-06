@@ -45,6 +45,7 @@ calculate_distances <- function(res_df, fps = 3) {
 #'
 #' @export
 analysis_summary <- function(dist) {
+  `%>%` <- dplyr::`%>%`
   summary_table <- dist_table %>%
     dplyr::summarise(
       `Distance Pixel` = sum(distance),
