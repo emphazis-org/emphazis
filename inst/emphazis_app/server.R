@@ -342,7 +342,7 @@ server <- function(
 
     shiny::req(react_values$dist_table)
 
-    react_values$dist_table
+    emphazis::analysis_summary(react_values$dist_table)
 
   })
 
