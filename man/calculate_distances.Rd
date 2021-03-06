@@ -4,7 +4,7 @@
 \alias{calculate_distances}
 \title{Calculate Distances}
 \usage{
-calculate_distances(res_df)
+calculate_distances(res_df, fps = 3)
 }
 \arguments{
 \item{res_df}{Output from video processing.}

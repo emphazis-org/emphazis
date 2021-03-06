@@ -43,3 +43,4 @@ testthat::test_that("Process video", {
    dim(y_test), c(50, 2)
   )
 })
+
