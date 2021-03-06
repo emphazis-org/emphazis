@@ -13,19 +13,32 @@ server <- function(
   # options(shiny.maxRequestSize = 900*1024^2) 900MB?
   base::options(shiny.maxRequestSize = 900 * 1024 ^ 2)
 
-
   ### initial values, needed for reactivity ####
   react_values <- shiny::reactiveValues()
 
   react_values$subject_model <- NULL
   react_values$frames_output <- NULL
   react_values$dist_table <- NULL
+
+  # Upload panel
   react_values$first_frame_path <- NULL
 
+  # arena panel
   react_values$arena_x1 <- 0
   react_values$arena_y1 <- 0
   react_values$arena_x2 <- 0
   react_values$arena_y2 <- 0
+
+  react_values$arena_slice_path <- NULL
+
+
+  # subject panel
+  react_values$subject_x1 <- 0
+  react_values$subject_y1 <- 0
+  react_values$subject_x2 <- 0
+  react_values$subject_y2 <- 0
+
+  react_values$arena_slice_path <- NULL
 
   # Update Interface based on inputs ------------------------------------------
 
@@ -171,53 +184,135 @@ server <- function(
   shiny::observeEvent(input$cut_arena_button, {
 
     shiny::req(react_values$first_frame_path)
-    emphazis::slice_image(
 
+    react_values$arena_slice_path <- emphazis::slice_image(
+      image_path = react_values$first_frame_path,
+      output_path = fs::path_temp("slice_1"),
+      coord1 = c(react_values$arena_x1, react_values$arena_y1),
+      coord2 = c(react_values$arena_x2, react_values$arena_y2)
     )
   })
+
+  output$sliced_arena <- shiny::renderImage({
+    shiny::req(react_values$arena_slice_path)
+    list(
+      src = react_values$arena_slice_path,
+      contentType = "image/jpg",
+      alt = "Arena slice"
+    )
+    }, deleteFile = FALSE
+  )
 
   shiny::observeEvent(input$restart_arena_button, {
-    output$input_cut_frame <- shiny::renderImage({
-      shiny::req(react_values$first_frame_path)
-      list(
-        src = react_values$first_frame_path,
-        contentType = "image/jpg",
-        alt = "Arena selection image"
-      )
-    }, deleteFile = FALSE
+    react_values$arena_slice_path <- NULL
+  })
+
+  # Subject selection panel ---------------------------------------------------
+  output$subject_select <- shiny::renderImage({
+
+    shiny::req(react_values$arena_slice_path)
+
+    list(
+      src = react_values$arena_slice_path,
+      contentType = "image/jpg",
+      alt = "Arena selection image"
+    )
+  }, deleteFile = FALSE
+  )
+
+  shiny::observeEvent(input$subject_brush, {
+    shiny::req(input$subject_coord_radio == 3)
+    react_values$subject_x1 <- round(as.numeric(input$subject_brush$xmin), 0)
+    react_values$subject_x2 <- round(as.numeric(input$subject_brush$xmax), 0)
+    react_values$subject_y1 <- round(as.numeric(input$subject_brush$ymin), 0)
+    react_values$subject_y2 <- round(as.numeric(input$subject_brush$ymax), 0)
+  })
+
+  shiny::observeEvent(input$subject_click, {
+    shiny::req(input$subject_coord_radio == 1)
+    react_values$subject_x1 <- round(as.numeric(input$subject_click$x), 0)
+    react_values$subject_y1 <- round(as.numeric(input$subject_click$y), 0)
+  })
+
+  shiny::observeEvent(input$subject_click, {
+    shiny::req(input$subject_coord_radio == 2)
+    react_values$subject_x2 <- round(as.numeric(input$subject_click$x), 0)
+    react_values$subject_y2 <- round(as.numeric(input$subject_click$y), 0)
+  })
+
+  output$subject_coord_info <- shiny::renderTable({
+    tibble::tibble(
+      Coord = c("1", "2"),
+      X = c(react_values$subject_x1, react_values$subject_x2),
+      Y = c(react_values$subject_y1, react_values$subject_y2)
+    )},
+    digits = 0
+  )
+
+  shiny::observeEvent(input$cut_subject_button, {
+
+    shiny::req(react_values$arena_slice_path)
+
+    react_values$subject_slice_path <- emphazis::slice_image(
+      image_path = react_values$arena_slice_path,
+      output_path = fs::path_temp("slice_subject"),
+      coord1 = c(react_values$subject_x1, react_values$subject_y1),
+      coord2 = c(react_values$subject_x2, react_values$subject_y2)
     )
   })
+
+  output$sliced_subject <- shiny::renderImage({
+    shiny::req(react_values$subject_slice_path)
+    list(
+      src = react_values$subject_slice_path,
+      contentType = "image/jpg",
+      alt = "Subjecy slice"
+    )
+  }, deleteFile = FALSE
+  )
+
+  shiny::observeEvent(input$restart_arena_button, {
+    react_values$subject_slice_path <- NULL
+  })
+
 
   # Analysis panel -------------------------------------------------------------
   shiny::observeEvent(input$start_job, {
 
     shiny::req(
       input$input_video,
-      input$input_subject,
-      input$input_bg
+      # input$input_subject,
+      react_values$arena_slice_path,
+      react_values$subject_slice_path,
+      # input$input_bg
     )
 
     message("Start analysis")
 
-    fs::file_exists(input$input_subject$datapath)
-    fs::file_exists(input$input_bg$datapath)
-    fs::file_exists(input$input_video$datapath)
+    #fs::file_exists(input$input_subject$datapath)
+    #fs::file_exists(input$input_bg$datapath)
+    #fs::file_exists(input$input_video$datapath)
 
     coord_1 <- c(
-      input$arena_x_1,
-      input$arena_y_1
+      react_values$arena_x1,
+      react_values$arena_y1
     )
 
     coord_2 <- c(
-      input$arena_x_2,
-      input$arena_y_2
-    )
-    react_values$subject_model <- emphazis::generate_subject_model(
-      subject_path = input$input_subject$datapath,
-      background_path = input$input_bg$datapath
+      react_values$arena_x2,
+      react_values$arena_y2
     )
 
+    message("model start")
+
+    react_values$subject_model <- emphazis::generate_subject_model(
+      subject_path = react_values$subject_slice_path,
+      background_path = react_values$arena_slice_path
+    )
+    message("Model finished")
+
     video_path <- input$input_video$datapath
+
 
     temp_frames_path <- fs::path_temp("frames")
     progressr::withProgressShiny(
@@ -235,19 +330,19 @@ server <- function(
       }
     )
 
-    message("Mid analysis")
-
-    react_values$dist_table <- emphazis::calculate_distances(react_values$frames_output)
-
+    message("Video finished")
+    react_values$dist_table <- emphazis::calculate_distances(
+      res_df = react_values$frames_output,
+      fps = input$fps_slider
+    )
     message("Finished analysis")
-
   })
 
   output$analysis_summary <- shiny::renderTable({
 
     shiny::req(react_values$dist_table)
 
-    head(react_values$dist_table)
+    react_values$dist_table
 
   })
 

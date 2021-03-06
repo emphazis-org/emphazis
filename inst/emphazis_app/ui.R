@@ -206,27 +206,27 @@ ui <-  shiny::navbarPage(
           "restart_arena_button", "Restart"
         ),
 
-        shiny::tags$br(),
-        shiny::sliderInput(
-          inputId = "slider_arena_x1",
-          min = 1, max = 100, step = 1, round = TRUE, value = 1,
-          label = "X1 Coord"
-        ),
-        shiny::sliderInput(
-          inputId = "slider_arena_y1",
-          min = 1, max = 100, step = 1, round = TRUE, value = 1,
-          label = "Y1 Coord"
-        ),
-        shiny::sliderInput(
-          inputId = "slider_arena_x2",
-          min = 1, max = 100, step = 1, round = TRUE, value = 100,
-          label = "X2 Coord"
-        ),
-        shiny::sliderInput(
-          inputId = "slider_arena_y2",
-          min = 1, max = 100, step = 1, round = TRUE, value = 100,
-          label = "Y2 Coord"
-        )
+        shiny::tags$br()
+        # shiny::sliderInput(
+        #   inputId = "slider_arena_x1",
+        #   min = 1, max = 100, step = 1, round = TRUE, value = 1,
+        #   label = "X1 Coord"
+        # ),
+        # shiny::sliderInput(
+        #   inputId = "slider_arena_y1",
+        #   min = 1, max = 100, step = 1, round = TRUE, value = 1,
+        #   label = "Y1 Coord"
+        # ),
+        # shiny::sliderInput(
+        #   inputId = "slider_arena_x2",
+        #   min = 1, max = 100, step = 1, round = TRUE, value = 100,
+        #   label = "X2 Coord"
+        # ),
+        # shiny::sliderInput(
+        #   inputId = "slider_arena_y2",
+        #   min = 1, max = 100, step = 1, round = TRUE, value = 100,
+        #   label = "Y2 Coord"
+        # )
         # shiny::textInput(
         #   inputId = "arena_width",
         #   label = "Arena Width(mm)",
@@ -251,6 +251,14 @@ ui <-  shiny::navbarPage(
           )
         ),
 
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+
+
         shiny::tags$div(
           shiny::tags$b("Sliced arena"),
           shiny::imageOutput(
@@ -261,6 +269,69 @@ ui <-  shiny::navbarPage(
     )
   ),
 
+  # Subject selection Panel ---------------------------------------------
+  shiny::tabPanel(
+    title = "Subject settings",
+    shiny::sidebarLayout(
+      sidebarPanel = shiny::sidebarPanel(
+        width = 3,
+        shiny::tags$h3(
+          shiny::tags$em(
+            shiny::tags$strong(
+              "Subject selection"
+            )
+          )
+        ),
+        shiny::tags$hr(),
+        # Copy the line below to make a set of radio buttons
+        shiny::radioButtons(
+          inputId = "subject_coord_radio",
+          label = shiny::tags$h3("Coord to select"),
+          choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
+          selected = 3
+        ),
+        shiny::tableOutput(
+          "subject_coord_info"
+        ),
+        shiny::actionButton(
+          "cut_subject_button","Apply slice"
+        ),
+
+        shiny::actionButton(
+          "restart_subject_button", "Restart"
+        ),
+
+        shiny::tags$br()
+      ),
+
+      # Main panel for image inputs
+      mainPanel = shiny::mainPanel(
+
+        shiny::tags$div(
+          shiny::tags$b("Selected subject"),
+          shiny::imageOutput(
+            outputId = "subject_select",
+            click = "subject_click",
+            brush = "subject_brush"
+          )
+        ),
+
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::tags$br(),
+
+        shiny::tags$div(
+          shiny::tags$b("Sliced subject"),
+          shiny::imageOutput(
+            outputId = "sliced_subject"
+          )
+        )
+      )
+    )
+  ),
   # Analysis Panel ------------------------------------------------------
   shiny::tabPanel(
     title = "Analysis",
