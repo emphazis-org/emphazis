@@ -78,7 +78,7 @@ proccess_video <- function(
     area_y_max <- dim(first_frame@.Data)[2]
 
   } else {
-    area_x_min <- coord1[2]
+    area_x_min <- coord1[1]
     area_x_max <- coord2[1]
     area_y_min <- coord1[2]
     area_y_max <- coord2[2]

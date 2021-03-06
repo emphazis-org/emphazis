@@ -24,7 +24,7 @@ slice_image <- function(image_path, output_path, coord1 = NULL, coord2 = NULL) {
     area_y_max <- dim(image_data)[2]
 
   } else {
-    area_x_min <- coord1[2]
+    area_x_min <- coord1[1]
     area_x_max <- coord2[1]
     area_y_min <- coord1[2]
     area_y_max <- coord2[2]
