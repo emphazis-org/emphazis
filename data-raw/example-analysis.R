@@ -9,6 +9,21 @@ video_path <- "data-raw/ives-data/movie_sample.mp4"
 
 temp_frames_path <- fs::path_temp("frames")
 
+
+frames_path <- convert_video_to_image(
+  video_path = video_path,
+  frames_path = fs::path_temp("frames2")
+)
+frames_path[1]
+
+n_frames <- av::av_video_info(video_path)$video$frames
+
+frames_path <- convert_video_to_image(
+  video_path = video_path,
+  frames_path = fs::path_temp("frames2"),
+  fps = (1/n_frames)*2
+)
+
 frames_output <- proccess_video(
   video_path = video_path,
   frames_path = temp_frames_path,

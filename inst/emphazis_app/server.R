@@ -5,6 +5,7 @@ server <- function(
   session
 ) {
 
+  `%>%` <- dplyr::`%>%`
   ## stop the R session
   session$onSessionEnded(stopApp)
   ##
@@ -19,7 +20,7 @@ server <- function(
   react_values$subject_model <- NULL
   react_values$frames_output <- NULL
   react_values$dist_table <- NULL
-
+  react_values$first_frame_path <- NULL
   # react_values$slider_min <- 0
   # react_values$slider_max <- 10
 
@@ -38,21 +39,30 @@ server <- function(
     }
   })
 
-
-
   # Upload files pane --------------------------------------------------------
-  # Print input images
-  output$video_description <- shiny::renderText({
-    shiny::req(input$input_video)
 
-    file <- input$input_video
+  output$video_description <- shiny::renderTable({
+      shiny::req(input$input_video)
 
-    # TODO use av::av_media_info to extract info
-    video_details <- glue::glue(
-      "File type: {file$type}; File size: {(file$size / (1024^2))} MB;"
-    )
-    video_details
-  })
+      file <- input$input_video
+      video_path <- file$datapath
+
+      video_details <- dplyr::bind_rows(
+        tibble::tibble(
+          var = c("File type", "Size"),
+          value = c(
+            base::as.character(file$type),
+            glue::glue("{round(file$size / (1024^2), 2)} MB")
+          )
+        ),
+        emphazis::extract_video_info(video_path = video_path)
+      )
+      video_details
+    },
+    bordered = TRUE,
+    colnames = FALSE,
+    digits = 2
+  )
 
   output$subject <- shiny::renderImage({
     shiny::req(input$input_subject)
@@ -86,56 +96,36 @@ server <- function(
   },  deleteFile = FALSE
   )
 
+  shiny::observeEvent(input$run_video_process, {
+      shiny::req(input$input_video)
+      video_path <- input$input_video$datapath
+      # Upload video
+      video_info <- av::av_video_info(video_path)$frames
+      frames_output <- emphazis::convert_video_to_image(
+        video_path = video_path,
+        frames_path = fs::path_temp("frame_1"),
+        fps = 0.2
+      )
+
+      video_info$video$height
+
+      output$input_first_frame <- shiny::renderImage({
+        list(
+          src = frames_output[1],
+          contentType = "image/jpg",
+          width = video_info$video$width*2,
+          height = video_info$video$height*2,
+          alt = "Image"
+        )
+      }, deleteFile = FALSE)
+    }
+  )
+
   # Selection panel -----------------------------------------------------------
 
-  observeEvent(input$run_video_process, {
-
-    shiny::req(input$input_video)
-
-    file.remove(
-      paste(tempdir(), list.files(tempdir(), pattern = ".jpg"), sep = "/")
-    )
-
-    video_path <- input$input_video$datapath
-
-    # Upload video
-    emphazis::video_to_image(
-      video_path = video_path, fps = input$fps_slider
-    )
-    frames <- list.files(tempdir(), pattern = ".jpg")
-
-    video_time <- av::av_media_info(video_path)$duration[1]
-
-    # progressr::withProgressShiny()
-
-
-    ######################### show Frame
-    output$input_first_frame <- shiny::renderImage({
-      shiny::req(input$input_video)
-
-      suppressWarnings(dir.create(tempdir()))
-      # A temp file to save the output.
-      # This file will be removed later by renderImage
-      file_names <- list.files(path = tempdir())
-
-      file_path <- paste(
-        tempdir(), file_names[round(length(file_names) / 2, 0)], sep = "\\"
-      )
-
-      list(
-        src = file_path,
-        contentType = "image/*",
-        width = 400,
-        # height = 400,
-        alt = "Image"
-      )
-    }, deleteFile = FALSE
-    )
-  })
 
 
   # Analysis panel -------------------------------------------------------------
-
   shiny::observeEvent(input$start_job, {
 
     shiny::req(

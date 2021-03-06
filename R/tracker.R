@@ -1,13 +1,43 @@
 #' Convert video to image
 #' @inheritParams proccess_video
+#' @family video_process
 #' @export
 convert_video_to_image <- function(video_path, frames_path, fps = 5) {
+
+  if (fs::dir_exists(frames_path)) {
+    fs::dir_delete(frames_path)
+  }
+  # av::av_log_level(set = "-8")
   av::av_video_images(
     video = video_path,
     destdir = frames_path,
     format = "jpg",
     fps = fps
   )
+}
+
+#' Convert video to image
+#' @inheritParams proccess_video
+#' @family video_process
+#' @export
+extract_video_info <- function(video_path) {
+  `%>%` <- dplyr::`%>%`
+
+  video_info <- av::av_media_info(video_path)
+
+  video_info$video$framerate <- as.character(round(as.numeric(video_info$video$framerate), 2))
+
+  tibble::tibble(
+    var = colnames(video_info$video),
+    value = unlist(video_info$video)
+  ) %>%
+    dplyr::bind_rows(
+      tibble::tibble(var = "duration", value = as.character(
+        round(video_info$duration, 2)
+        )
+      )
+    )
+
 }
 
 
@@ -20,6 +50,7 @@ convert_video_to_image <- function(video_path, frames_path, fps = 5) {
 #' @param coord1 length 2 vector with position of the top right point.
 #' @param coord2 length 2 vector with position of the bottom left point.
 #' @param fps default = 5; Frames per second to decompose video.
+#' @family video_process
 #' @export
 proccess_video <- function(
    video_path,
@@ -30,9 +61,7 @@ proccess_video <- function(
    fps = 5
 ) {
   `%>%` <- dplyr::`%>%`
-  if (fs::dir_exists(frames_path)) {
-    fs::dir_delete(frames_path)
-  }
+
   frames_vector <- convert_video_to_image(
     video_path = video_path, frames_path = frames_path, fps = fps
   )

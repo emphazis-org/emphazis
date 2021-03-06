@@ -29,3 +29,9 @@ proccess_video(
 \description{
 Extract data and frames from video.
 }
+\seealso{
+Other video_process: 
+\code{\link{convert_video_to_image}()},
+\code{\link{extract_video_info}()}
+}
+\concept{video_process}
