@@ -1,6 +1,6 @@
 #' Convert video to image
 #' @inheritParams proccess_video
-#' @family video_process
+#' @family video_tools
 #' @export
 convert_video_to_image <- function(video_path, frames_path, fps = 5) {
 
@@ -18,14 +18,16 @@ convert_video_to_image <- function(video_path, frames_path, fps = 5) {
 
 #' Convert video to image
 #' @inheritParams proccess_video
-#' @family video_process
+#' @family video_tools
 #' @export
 extract_video_info <- function(video_path) {
   `%>%` <- dplyr::`%>%`
 
   video_info <- av::av_media_info(video_path)
 
-  video_info$video$framerate <- as.character(round(as.numeric(video_info$video$framerate), 2))
+  video_info$video$framerate <- as.character(
+    round(as.numeric(video_info$video$framerate), 2)
+  )
 
   tibble::tibble(
     var = colnames(video_info$video),
@@ -47,10 +49,10 @@ extract_video_info <- function(video_path) {
 #' @param video_path Path to video file.
 #' @param subject_model model generated from `generate_subject_model()`.
 #' @param frames_path Path to save frames extracted from video.
-#' @param coord1 length 2 vector with position of the top right point.
-#' @param coord2 length 2 vector with position of the bottom left point.
+#' @param coord1 length 2 vector with position of the top left point.
+#' @param coord2 length 2 vector with position of the bottom right point.
 #' @param fps default = 5; Frames per second to decompose video.
-#' @family video_process
+#' @family video_tools
 #' @export
 proccess_video <- function(
    video_path,
@@ -66,14 +68,28 @@ proccess_video <- function(
     video_path = video_path, frames_path = frames_path, fps = fps
   )
 
-  im <- EBImage::readImage(frames_vector[1])
+  first_frame <- EBImage::readImage(frames_vector[1])
 
-  im2 <- im
+
   if (isTRUE(is.null(coord1) & is.null(coord2))) {
-    maat <- im@.Data
+    area_x_min <- 0
+    area_x_max <- dim(first_frame@.Data)[1]
+    area_y_min <- 0
+    area_y_max <- dim(first_frame@.Data)[2]
+
   } else {
-    maat <- im@.Data[coord1[1]:coord1[2], coord2[1]:coord2[2], ]
+    area_x_min <- coord1[2]
+    area_x_max <- coord2[1]
+    area_y_min <- coord1[2]
+    area_y_max <- coord2[2]
   }
+
+  area_x_range <- area_x_min:area_x_max
+  area_y_range <- area_y_min:area_y_max
+
+  im2 <- first_frame
+
+  maat <- first_frame@.Data[area_x_range, area_y_range, ]
   im2@.Data <- maat
 
   # Progress bar count
@@ -82,12 +98,10 @@ proccess_video <- function(
   # frame_path = frames_vector[2]
   extract_values <- function(frame_path) {
     `%>%` <- dplyr::`%>%`
-    im <- EBImage::readImage(frame_path)
-    if (isTRUE(is.null(coord1) & is.null(coord2))) {
-      maat <- im@.Data
-    } else {
-      maat <- im@.Data[coord1[1]:coord1[2], coord2[1]:coord2[2], ]
-    }
+    first_frame <- EBImage::readImage(frame_path)
+
+    maat <- first_frame@.Data[area_x_range, area_y_range, ]
+
     im2@.Data <- maat
     matIm2 <- cbind(
       c(im2@.Data[, , 1]), c(im2@.Data[, , 2]), c(im2@.Data[, , 3])
@@ -97,6 +111,7 @@ proccess_video <- function(
       subject_model, base::data.frame(matIm2),
       type = "response"
     ), 0)
+
     imM <- matrix(Pred, ncol = ncol(im2@.Data))
     imM <- EBImage::bwlabel(imM)
     imM <- EBImage::fillHull(imM)

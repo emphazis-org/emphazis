@@ -9,14 +9,19 @@ testthat::test_that("Process video", {
 
   video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
   temp_frames_path <- fs::path_temp("frames")
+  # av::av_video_info(video_path)
+  # (xmin, ymin)
+  coord1 <- c(285, 20)
+  # (xmax, ymax)
+  coord2 <- c(650, 430)
 
   progressr::with_progress({
     x_test <- proccess_video(
       video_path = video_path,
       frames_path = temp_frames_path,
       subject_model = model_test,
-      coord1 = c(285, 655),
-      coord2 = c(475, 20),
+      coord1 = coord1,
+      coord2 = coord2,
       fps = 3
     )
   })
@@ -34,5 +39,7 @@ testthat::test_that("Process video", {
     frames_path = temp_frames_path,
     subject_model = model_test
   )
-
+  testthat::expect_equal(
+   dim(y_test), c(50, 2)
+  )
 })
