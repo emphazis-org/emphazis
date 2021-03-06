@@ -134,8 +134,6 @@ server <- function(
     list(
       src = react_values$first_frame_path,
       contentType = "image/jpg",
-      #width = frame$video$width*2,
-      #height = frame$video$height*2,
       alt = "Arena selection image"
     )
     }, deleteFile = FALSE
@@ -149,21 +147,45 @@ server <- function(
     react_values$arena_y2 <- round(as.numeric(input$arena_brush$ymax), 0)
   })
 
+  shiny::observeEvent(input$arena_click, {
+    shiny::req(input$arena_coord_radio == 1)
+    react_values$arena_x1 <- round(as.numeric(input$arena_click$x), 0)
+    react_values$arena_y1 <- round(as.numeric(input$arena_click$y), 0)
+  })
+
+  shiny::observeEvent(input$arena_click, {
+    shiny::req(input$arena_coord_radio == 2)
+    react_values$arena_x2 <- round(as.numeric(input$arena_click$x), 0)
+    react_values$arena_y2 <- round(as.numeric(input$arena_click$y), 0)
+  })
+
   output$arena_coord_info <- shiny::renderTable({
     tibble::tibble(
       Coord = c("1", "2"),
       X = c(react_values$arena_x1, react_values$arena_x2),
       Y = c(react_values$arena_y1, react_values$arena_y2)
-    )
-  })
-
+    )},
+    digits = 0
+  )
 
   shiny::observeEvent(input$cut_arena_button, {
 
+    shiny::req(react_values$first_frame_path)
+    emphazis::slice_image(
+
+    )
   })
 
   shiny::observeEvent(input$restart_arena_button, {
-
+    output$input_cut_frame <- shiny::renderImage({
+      shiny::req(react_values$first_frame_path)
+      list(
+        src = react_values$first_frame_path,
+        contentType = "image/jpg",
+        alt = "Arena selection image"
+      )
+    }, deleteFile = FALSE
+    )
   })
 
   # Analysis panel -------------------------------------------------------------
@@ -180,7 +202,6 @@ server <- function(
     fs::file_exists(input$input_subject$datapath)
     fs::file_exists(input$input_bg$datapath)
     fs::file_exists(input$input_video$datapath)
-
 
     coord_1 <- c(
       input$arena_x_1,
@@ -213,7 +234,6 @@ server <- function(
         )
       }
     )
-
 
     message("Mid analysis")
 

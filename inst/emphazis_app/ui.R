@@ -192,7 +192,7 @@ ui <-  shiny::navbarPage(
         shiny::radioButtons(
           inputId = "arena_coord_radio",
           label = shiny::tags$h3("Coord to select"),
-          choices = list("Bottom left" = 1, "Top right" = 2, "Area" = 3),
+          choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
           selected = 3
         ),
         shiny::tableOutput(
@@ -208,35 +208,35 @@ ui <-  shiny::navbarPage(
 
         shiny::tags$br(),
         shiny::sliderInput(
-          inputId = "arena_x_1",
+          inputId = "slider_arena_x1",
           min = 1, max = 100, step = 1, round = TRUE, value = 1,
           label = "X1 Coord"
         ),
         shiny::sliderInput(
-          inputId = "arena_y_1",
+          inputId = "slider_arena_y1",
           min = 1, max = 100, step = 1, round = TRUE, value = 1,
           label = "Y1 Coord"
         ),
         shiny::sliderInput(
-          inputId = "arena_x_2",
+          inputId = "slider_arena_x2",
           min = 1, max = 100, step = 1, round = TRUE, value = 100,
           label = "X2 Coord"
         ),
         shiny::sliderInput(
-          inputId = "arena_y_2",
+          inputId = "slider_arena_y2",
           min = 1, max = 100, step = 1, round = TRUE, value = 100,
           label = "Y2 Coord"
-        ),
-        shiny::textInput(
-          inputId = "arena_width",
-          label = "Arena Width(mm)",
-          value = 1
-        ),
-        shiny::textInput(
-          inputId = "arena_length",
-          label = "Arena Length(mm)",
-          value = 1
         )
+        # shiny::textInput(
+        #   inputId = "arena_width",
+        #   label = "Arena Width(mm)",
+        #   value = 1
+        # ),
+        # shiny::textInput(
+        #   inputId = "arena_length",
+        #   label = "Arena Length(mm)",
+        #   value = 1
+        # )
       ),
 
       # Main panel for image inputs
@@ -246,10 +246,15 @@ ui <-  shiny::navbarPage(
           shiny::tags$b("Selected arena"),
           shiny::imageOutput(
             outputId = "input_cut_frame",
-            click = "arena_coord_click",
-            # dblclick = "plot_dblclick",
-            # hover = "arena_area_hover",
+            click = "arena_click",
             brush = "arena_brush"
+          )
+        ),
+
+        shiny::tags$div(
+          shiny::tags$b("Sliced arena"),
+          shiny::imageOutput(
+            outputId = "sliced_arena"
           )
         )
       )
