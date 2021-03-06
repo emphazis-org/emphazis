@@ -22,7 +22,8 @@ generate_subject_model <- function(subject_path, background_path) {
   bg_mat <- bg_mat[sample(seq_len(nrow(bg_mat))), ]
   subject_mat <- subject_mat[sample(seq_len(nrow(subject_mat))), ]
 
-  Mat <- rbind(cbind(bg_mat[1:500, ], 0), cbind(subject_mat[1:500, ], 1))
+  Mat <- rbind(cbind(bg_mat[ , ], 0), cbind(subject_mat[ , ], 1))
+  #Mat <- rbind(cbind(bg_mat[1:500, ], 0), cbind(subject_mat[1:500, ], 1))
   colnames(Mat) <- c("R", "G", "B", "Y")
 
   subject_model <- base::suppressWarnings({
