@@ -6,6 +6,7 @@ pkg_deps <- c(
   "shiny",
   "shinythemes",
   "shinycssloaders",
+  "shinyWidgets",
   "metathis"
 )
 
@@ -140,7 +141,8 @@ ui <-  shiny::navbarPage(
         shiny::tags$hr(),
         shiny::sliderInput(
           inputId = "fps_slider",
-          min = 1, max = 24, step = 1, round = T, value = 5,
+          min = 1, max = 24, step = 1,
+          round = TRUE, value = 5,
           label = "Choose Frames per Second"
         ),
 
@@ -148,27 +150,31 @@ ui <-  shiny::navbarPage(
           inputId = "run_video_process",
           label = "Decompose video",
           icon = shiny::icon("film")
+        ),
+
+        shiny::tags$div(
+          shiny::tags$b("Video details"),
+          shiny::tableOutput(
+            outputId = "video_description"
+          )
         )
       ),
 
       # Main panel for image inputs
       mainPanel = shiny::mainPanel(
-        shiny::tags$b("Video decomposition progress"),
-        shiny::tags$br(),
-        # shinyWidgets::progressBar(
-        #   id = "video_input_prog_bar",
-        #   value = 0, total = 100
-        # ),
-        shiny::imageOutput(
-          outputId = "input_first_frame"
-        ),
-        shiny::textOutput(
-          outputId = "video_description"
-        ),
+
+        shiny::tags$div(
+          shiny::tags$b("Video decomposed frame"),
+          shiny::tags$br(),
+          shiny::imageOutput(
+            outputId = "input_first_frame"
+          )
+        )
       )
     )
   ),
-  # Frame selection panel ------------------------------------------------
+
+  # Arena selection panel ------------------------------------------------
   shiny::tabPanel(
     title = "Arena settings",
     shiny::sidebarLayout(
@@ -182,28 +188,45 @@ ui <-  shiny::navbarPage(
           )
         ),
         shiny::tags$hr(),
+        # Copy the line below to make a set of radio buttons
+        shiny::radioButtons(
+          inputId = "arena_coord_radio",
+          label = shiny::tags$h3("Coord to select"),
+          choices = list("Bottom left" = 1, "Top right" = 2, "Area" = 3),
+          selected = 3
+        ),
+        shiny::tableOutput(
+          "arena_coord_info"
+        ),
+        shiny::actionButton(
+          "cut_arena_button","Apply slice"
+        ),
+
+        shiny::actionButton(
+          "restart_arena_button", "Restart"
+        ),
+
         shiny::tags$br(),
         shiny::sliderInput(
           inputId = "arena_x_1",
-          min = 1, max = 100, step = 1, round = T, value = 1,
+          min = 1, max = 100, step = 1, round = TRUE, value = 1,
           label = "X1 Coord"
         ),
         shiny::sliderInput(
-          inputId = "arena_x_2",
-          min = 1, max = 100, step = 1, round = T, value = 100,
-          label = "X2 Coord"
-        ),
-        shiny::sliderInput(
           inputId = "arena_y_1",
-          min = 1, max = 100, step = 1, round = T, value = 1,
+          min = 1, max = 100, step = 1, round = TRUE, value = 1,
           label = "Y1 Coord"
         ),
         shiny::sliderInput(
+          inputId = "arena_x_2",
+          min = 1, max = 100, step = 1, round = TRUE, value = 100,
+          label = "X2 Coord"
+        ),
+        shiny::sliderInput(
           inputId = "arena_y_2",
-          min = 1, max = 100, step = 1, round = T, value = 100,
+          min = 1, max = 100, step = 1, round = TRUE, value = 100,
           label = "Y2 Coord"
         ),
-        # actionButton("cut_frame_button","Apply slice"),
         shiny::textInput(
           inputId = "arena_width",
           label = "Arena Width(mm)",
@@ -218,13 +241,22 @@ ui <-  shiny::navbarPage(
 
       # Main panel for image inputs
       mainPanel = shiny::mainPanel(
-        shiny::tags$b("Selected arena"),
-        shiny::imageOutput(outputId = "input_cut_frame")
+
+        shiny::tags$div(
+          shiny::tags$b("Selected arena"),
+          shiny::imageOutput(
+            outputId = "input_cut_frame",
+            click = "arena_coord_click",
+            # dblclick = "plot_dblclick",
+            # hover = "arena_area_hover",
+            brush = "arena_brush"
+          )
+        )
       )
     )
   ),
 
-  # Analysis Panel -------------------------------------------------------
+  # Analysis Panel ------------------------------------------------------
   shiny::tabPanel(
     title = "Analysis",
     shiny::sidebarLayout(

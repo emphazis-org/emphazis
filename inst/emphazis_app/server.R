@@ -21,8 +21,11 @@ server <- function(
   react_values$frames_output <- NULL
   react_values$dist_table <- NULL
   react_values$first_frame_path <- NULL
-  # react_values$slider_min <- 0
-  # react_values$slider_max <- 10
+
+  react_values$arena_x1 <- 0
+  react_values$arena_y1 <- 0
+  react_values$arena_x2 <- 0
+  react_values$arena_y2 <- 0
 
   # Update Interface based on inputs ------------------------------------------
 
@@ -107,7 +110,7 @@ server <- function(
         fps = 0.2
       )
 
-      video_info$video$height
+      react_values$first_frame_path <- frames_output[1]
 
       output$input_first_frame <- shiny::renderImage({
         list(
@@ -115,15 +118,53 @@ server <- function(
           contentType = "image/jpg",
           width = video_info$video$width*2,
           height = video_info$video$height*2,
-          alt = "Image"
+          alt = "First frame image"
         )
       }, deleteFile = FALSE)
-    }
+    },
+    once = TRUE
   )
 
   # Selection panel -----------------------------------------------------------
 
+  output$input_cut_frame <- shiny::renderImage({
 
+    shiny::req(react_values$first_frame_path)
+
+    list(
+      src = react_values$first_frame_path,
+      contentType = "image/jpg",
+      #width = frame$video$width*2,
+      #height = frame$video$height*2,
+      alt = "Arena selection image"
+    )
+    }, deleteFile = FALSE
+  )
+
+  shiny::observeEvent(input$arena_brush, {
+    shiny::req(input$arena_coord_radio == 3)
+    react_values$arena_x1 <- round(as.numeric(input$arena_brush$xmin), 0)
+    react_values$arena_x2 <- round(as.numeric(input$arena_brush$xmax), 0)
+    react_values$arena_y1 <- round(as.numeric(input$arena_brush$ymin), 0)
+    react_values$arena_y2 <- round(as.numeric(input$arena_brush$ymax), 0)
+  })
+
+  output$arena_coord_info <- shiny::renderTable({
+    tibble::tibble(
+      Coord = c("1", "2"),
+      X = c(react_values$arena_x1, react_values$arena_x2),
+      Y = c(react_values$arena_y1, react_values$arena_y2)
+    )
+  })
+
+
+  shiny::observeEvent(input$cut_arena_button, {
+
+  })
+
+  shiny::observeEvent(input$restart_arena_button, {
+
+  })
 
   # Analysis panel -------------------------------------------------------------
   shiny::observeEvent(input$start_job, {
