@@ -4,7 +4,7 @@
 #' Calculate distances and cumulative distances from frame to frame.
 #' @param res_df Output from video processing.
 #' @export
-calculate_distances <- function(res_df) {
+calculate_distances <- function(res_df, fps = 3) {
   `%>%` <- dplyr::`%>%`
 
   dist <- NULL
@@ -12,7 +12,7 @@ calculate_distances <- function(res_df) {
     dist <- c(dist, sqrt(sum((res_df[i - 1, ] - res_df[i, ])^2)))
   }
 
-  frame_time <- 1 / 3
+  frame_time <- 1 / fps
 
   # TODO definir esse valor de conversao
   pixel_to_cm <- function(x, conversion_rate = 21 / 413.5) {
@@ -23,7 +23,7 @@ calculate_distances <- function(res_df) {
   }
 
   dist_table <- tibble::tibble(
-    time = c(0, seq(1, length(dist)) / 3),
+    time = c(0, seq(1, length(dist)) / fps),
     distance = c(0, dist)
   ) %>%
     dplyr::bind_cols(res_df) %>%
@@ -35,6 +35,29 @@ calculate_distances <- function(res_df) {
     # dplyr::mutate(count_square = count_area_square(dist_table, 50)) %>%
     dplyr::mutate(count = count_area_circle(., 50))
   return(dist_table)
+}
+
+#' Analysis summary
+#'
+#' @description prepare table summaries
+#'
+#' @param dist_table Output from `calculate_distances`.
+#'
+#' @export
+analysis_summary <- function(dist) {
+  summary_table <- dist_table %>%
+    dplyr::summarise(
+      `Distance Pixel` = sum(distance),
+      `Distance cm` = sum(dist_cm),
+      `Average Speed cm/s` = mean(sum(speed)/sum(distance)),
+      `Number of frames` = dplyr::n_distinct(frame)
+    ) %>%
+    tidyr::pivot_longer(
+      cols = dplyr::everything(),
+      names_to = "var"
+    )
+
+  return(summary_table)
 }
 
 #' Count occurrences in square area
