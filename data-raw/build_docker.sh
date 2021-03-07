@@ -1,5 +1,5 @@
 # to build
-docker build inst -t luciorq/emphazis-app:latest
+docker build . -f inst/Dockerfile -t luciorq/emphazis-app:latest
 
 # to run
 docker run -d \
