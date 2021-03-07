@@ -16,14 +16,23 @@ RUN Rscript -e 'remotes::install_version("stringr",upgrade="never", version = "1
 RUN Rscript -e 'remotes::install_version("shiny",upgrade="never", version = "1.6.0")'
 RUN Rscript -e 'remotes::install_version("shinythemes",upgrade="never", version = "1.2.0")'
 RUN Rscript -e 'remotes::install_version("shinycssloaders",upgrade="never", version = "1.0.0")'
-RUN Rscript -e 'remotes::install_github("emphazis-org/emphazis@main", upgrade="never")'
+RUN Rscript -e 'remotes::install_version("colourpicker",upgrade="never")'
+
 # RUN Rscript -e 'remotes::install_version("EBImage",upgrade="never", version = "4.32.0")'
 # RUN Rscript -e 'remotes::install_version("shiny",upgrade="never", version = "1.6.0")'
 # RUN Rscript -e 'remotes::install_version("ggplot2",upgrade="never", version = "3.3.3")'
 # RUN Rscript -e 'remotes::install_version("av",upgrade="never", version = "0.5.1")'
+
+RUN Rscript -e 'remotes::install_github("emphazis-org/emphazis@main", upgrade="never")'
+
+# RUN Rscript -e 'remotes::install_github("emphazis-org/shinyemphazis@main", upgrade="never")'
+
 # RUN mkdir /build_zone
 # ADD . /build_zone
 # WORKDIR /build_zone
 # RUN R -e 'remotes::install_local(upgrade="never")'
 EXPOSE 3838
+
 CMD R -e "emphazis::emphazis_app(host = '0.0.0.0', port = 3838, launch.browser = FALSE)"
+
+#CMD R -e "shinyemphazis::run_app(host = '0.0.0.0', port = 3838, launch.browser = FALSE)"

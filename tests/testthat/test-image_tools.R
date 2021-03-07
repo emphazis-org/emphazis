@@ -23,7 +23,7 @@ testthat::test_that("Image slice", {
   test_image <- EBImage::readImage(sliced_path)
 
 
-  testthat::expect_equal(dim(test_image@.Data), c(659, 450, 3))
+  testthat::expect_equal(dim(test_image@.Data), c(408, 450, 3))
 })
 
 
@@ -50,7 +50,7 @@ testthat::test_that("Image slice data", {
   arena_frame <- first_frame
   # 1st dim = X starting from left
   # 2nd dim = Y starting from top
-  arena_frame@.Data <- frame_data[0:arena_xmax,0:(arena_ymax-200), ]
+  arena_frame@.Data <- frame_data[0:arena_xmax, 0:(arena_ymax - 200), ]
   #plot(arena_frame)
 
   testthat::expect_equal(dim(arena_frame@.Data), c(848, 280, 3))

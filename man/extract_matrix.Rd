@@ -4,7 +4,12 @@
 \alias{extract_matrix}
 \title{Full matrix from sparse columns}
 \usage{
-extract_matrix(data_df)
+extract_matrix(
+  data_df,
+  x_col = "x_center",
+  y_col = "y_center",
+  val_col = "count"
+)
 }
 \description{
 Extract full matrix from sparse matrix contained on data.frame columns.

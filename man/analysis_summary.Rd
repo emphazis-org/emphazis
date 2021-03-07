@@ -4,7 +4,7 @@
 \alias{analysis_summary}
 \title{Analysis summary}
 \usage{
-analysis_summary(dist)
+analysis_summary(dist_table)
 }
 \arguments{
 \item{dist_table}{Output from `calculate_distances`.}

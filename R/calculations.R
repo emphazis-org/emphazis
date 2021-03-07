@@ -44,14 +44,15 @@ calculate_distances <- function(res_df, fps = 3) {
 #' @param dist_table Output from `calculate_distances`.
 #'
 #' @export
-analysis_summary <- function(dist) {
+analysis_summary <- function(dist_table) {
   `%>%` <- dplyr::`%>%`
+  .data <- rlang::.data
   summary_table <- dist_table %>%
     dplyr::summarise(
-      `Distance Pixel` = sum(distance),
-      `Distance cm` = sum(dist_cm),
-      `Average Speed cm/s` = mean(sum(speed)/sum(distance)),
-      `Number of frames` = dplyr::n_distinct(frame)
+      `Distance traveled (Pixel)` = sum(.data$distance),
+      `Distance traveled (cm)` = sum(.data$dist_cm),
+      `Average Speed (cm/s)` = mean(sum(.data$speed)/sum(.data$distance)),
+      `Number of frames` = dplyr::n_distinct(.data$frame)
     ) %>%
     tidyr::pivot_longer(
       cols = dplyr::everything(),

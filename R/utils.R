@@ -3,14 +3,19 @@
 #' Extract full matrix from sparse matrix contained on data.frame columns.
 #'
 #' @export
-extract_matrix <- function(data_df) {
+extract_matrix <- function(
+  data_df,
+  x_col = "x_center",
+  y_col = "y_center",
+  val_col = "count"
+) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
   sparse_mat_df <- data_df %>%
     dplyr::rename(
-      x = "x_center",
-      y = "y_center",
-      z = "count"
+      x = {{ x_col }},
+      y = {{ y_col }},
+      z = {{ val_col }}
     ) %>%
     dplyr::select(c(.data[["x"]], .data[["y"]], .data[["z"]])) %>%
     dplyr::mutate(
