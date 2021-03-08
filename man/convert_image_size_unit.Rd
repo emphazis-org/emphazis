@@ -18,8 +18,6 @@ convert_image_size_unit(
 \item{width}{Image width in centimeter.}
 
 \item{height}{Image height in centimeter.}
-
-\item{dpi}{Pixel per inch.}
 }
 \description{
 Convert image sizes to pixel from other units.

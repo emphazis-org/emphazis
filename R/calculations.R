@@ -5,7 +5,7 @@
 #' @param conversion_rate Default: NULL. Value of unit conversion rate.
 #'   If rate values differ from width and height, a length two numeric vector
 #'   with conversion rates for width and lengths can be supplied.
-#' @inheritParams
+#' @inheritParams proccess_video
 #' @export
 calculate_metrics <- function(
   res_df,

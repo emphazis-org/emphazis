@@ -9,6 +9,8 @@ calculate_metrics(res_df, fps = 5, conversion_rate = NULL)
 \arguments{
 \item{res_df}{Output from video processing.}
 
+\item{fps}{default = 5; Frames per second to decompose video.}
+
 \item{conversion_rate}{Default: NULL. Value of unit conversion rate.
 If rate values differ from width and height, a length two numeric vector
 with conversion rates for width and lengths can be supplied.}

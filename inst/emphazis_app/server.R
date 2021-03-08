@@ -333,7 +333,8 @@ server <- function(
     message("Video finished")
     react_values$metrics_table <- emphazis::calculate_metrics(
       res_df = react_values$frames_output,
-      fps = input$fps_slider
+      fps = input$fps_slider,
+      conversion_rate = input$conversion_rate
     )
     message("Finished analysis")
   })
