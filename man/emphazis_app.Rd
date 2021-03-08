@@ -7,7 +7,7 @@
 emphazis_app(
   host = "127.0.0.1",
   port = NULL,
-  launch.browser = TRUE,
+  launch_browser = TRUE,
   test = FALSE
 )
 }
@@ -24,7 +24,7 @@ after the app is started. Defaults to true in interactive sessions only. This va
 this parameter can also be a function to call with the application's URL.}
 }
 \description{
-\code{emphazis_app} Automated tracking analysis for emphazis package.
+`emphazis_app` Automated tracking analysis for emphazis package.
 }
 \examples{
 
