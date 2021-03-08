@@ -4,10 +4,10 @@
 \alias{calculate_metrics}
 \title{Calculate Distances}
 \usage{
-calculate_metrics(res_df, fps = 5, conversion_rate = NULL)
+calculate_metrics(position_table, fps = 5, conversion_rate = NULL)
 }
 \arguments{
-\item{res_df}{Output from video processing.}
+\item{position_table}{Coordinate position of subject per frame.}
 
 \item{fps}{default = 5; Frames per second to decompose video.}
 

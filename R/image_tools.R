@@ -58,7 +58,7 @@ slice_image <- function(
 #' @param image_path Path to image.
 #' @param width Image width in centimeter.
 #' @param height Image height in centimeter.
-#' @param dpi Pixel per inch.
+#' @inheritParams proccess_video
 #' @export
 convert_image_size_unit <- function(
   image_path,
