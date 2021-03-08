@@ -117,17 +117,17 @@ server <- function(
       video_path <- input$input_video$datapath
       # Upload video
       video_info <- av::av_video_info(video_path)$frames
-      frames_output <- emphazis::convert_video_to_image(
+      frames_output_path <- emphazis::convert_video_to_image(
         video_path = video_path,
         frames_path = fs::path_temp("frame_1"),
         fps = 0.2
       )
 
-      react_values$first_frame_path <- frames_output[1]
+      react_values$first_frame_path <- frames_output_path[1]
 
       output$input_first_frame <- shiny::renderImage({
         list(
-          src = frames_output[1],
+          src = frames_output_path[1],
           contentType = "image/jpg",
           width = video_info$video$width*2,
           height = video_info$video$height*2,
@@ -289,10 +289,6 @@ server <- function(
 
     message("Start analysis")
 
-    #fs::file_exists(input$input_subject$datapath)
-    #fs::file_exists(input$input_bg$datapath)
-    #fs::file_exists(input$input_video$datapath)
-
     coord_1 <- c(
       react_values$arena_x1,
       react_values$arena_y1
@@ -329,21 +325,46 @@ server <- function(
         )
       }
     )
-
     message("Video finished")
+  })
+
+  metrics_table_inputs <- shiny::reactive({
+    list(
+      react_values$frames_output,
+      input$fps_slider,
+      input$conversion_rate,
+      input$conversion_unit_radio
+    )
+  })
+
+  shiny::observeEvent(metrics_table_inputs(), {
+
+    shiny::req(
+      react_values$frames_output,
+      input$fps_slider,
+      input$conversion_rate
+    )
+
     react_values$metrics_table <- emphazis::calculate_metrics(
-      res_df = react_values$frames_output,
+      position_table = react_values$frames_output,
       fps = input$fps_slider,
       conversion_rate = input$conversion_rate
     )
-    message("Finished analysis")
+
+    message("Metrics generated")
   })
 
   output$analysis_summary <- shiny::renderTable({
 
-    shiny::req(react_values$metrics_table)
+    shiny::req(
+      react_values$metrics_table,
+      input$conversion_unit_radio
+    )
 
-    emphazis::analysis_summary(react_values$metrics_table)
+    emphazis::analysis_summary(
+      metrics_table = react_values$metrics_table,
+      unit = input$conversion_unit_radio
+    )
 
   })
 

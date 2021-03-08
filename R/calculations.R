@@ -1,14 +1,14 @@
 #' Calculate Distances
 #'
 #' Calculate distances and cumulative distances from frame to frame.
-#' @param res_df Output from video processing.
+#' @param position_table Coordinate position of subject per frame.
 #' @param conversion_rate Default: NULL. Value of unit conversion rate.
 #'   If rate values differ from width and height, a length two numeric vector
 #'   with conversion rates for width and lengths can be supplied.
 #' @inheritParams proccess_video
 #' @export
 calculate_metrics <- function(
-  res_df,
+  position_table,
   fps = 5,
   conversion_rate = NULL
 ) {
@@ -37,13 +37,17 @@ calculate_metrics <- function(
     heigth_conversion_rate <- conversion_rate[2]
   }
 
-  res_df <- res_df %>%
-    dplyr::mutate(x_center = pixel_to_unit(x_center, width_conversion_rate)) %>%
-    dplyr::mutate(y_center = pixel_to_unit(y_center, heigth_conversion_rate))
+  position_table <- position_table %>%
+    dplyr::mutate(
+      x_center = pixel_to_unit(x_center, width_conversion_rate)
+    ) %>%
+    dplyr::mutate(
+      y_center = pixel_to_unit(y_center, heigth_conversion_rate)
+    )
 
   dist_vector <- NULL
-  for (i in 2:nrow(res_df)) {
-    dist_vector <- c(dist_vector, sqrt(sum((res_df[i - 1, ] - res_df[i, ])^2)))
+  for (i in 2:nrow(position_table)) {
+    dist_vector <- c(dist_vector, sqrt(sum((position_table[i - 1, ] - position_table[i, ])^2)))
   }
 
   metrics_table <- tibble::tibble(
@@ -51,7 +55,7 @@ calculate_metrics <- function(
     distance = c(0, dist_vector)
   )
 
-  metrics_table <- res_df %>%
+  metrics_table <- position_table %>%
     dplyr::bind_cols(metrics_table) %>%
     tibble::rowid_to_column(var = "frame") %>%
     #dplyr::mutate(dist_cm = pixel_to_unit(.data$distance)) %>%

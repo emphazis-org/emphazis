@@ -136,10 +136,10 @@ proccess_video <- function(
     return(res_temp)
   }
 
-  res_df <- purrr::map_dfr(
+  position_table <- purrr::map_dfr(
     frames_vector,
     extract_values
   )
 
-  return(res_df)
+  return(position_table)
 }
