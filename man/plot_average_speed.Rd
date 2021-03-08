@@ -5,7 +5,7 @@
 \title{Plot average speed
 Plot cumulative sum of distance traveled by the subject.}
 \usage{
-plot_average_speed(dist_table, range = NULL)
+plot_average_speed(metrics_table, range = NULL)
 }
 \description{
 Plot average speed

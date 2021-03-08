@@ -18,7 +18,7 @@ server <- function(
 
   react_values$subject_model <- NULL
   react_values$frames_output <- NULL
-  react_values$dist_table <- NULL
+  react_values$metrics_table <- NULL
 
   # Upload panel
   react_values$first_frame_path <- NULL
@@ -43,9 +43,9 @@ server <- function(
   # Update Interface based on inputs ------------------------------------------
 
   shiny::observeEvent(input$update_slider, {
-    if (!is.null(react_values$dist_table)) {
+    if (!is.null(react_values$metrics_table)) {
       max_slider_value <- length(
-        unique(dplyr::pull(react_values$dist_table, "frame"))
+        unique(dplyr::pull(react_values$metrics_table, "frame"))
       )
       shiny::updateSliderInput(
         inputId = "frame_range",
@@ -266,7 +266,7 @@ server <- function(
     list(
       src = react_values$subject_slice_path,
       contentType = "image/jpg",
-      alt = "Subjecy slice"
+      alt = "Subject slice"
     )
   }, deleteFile = FALSE
   )
@@ -331,7 +331,7 @@ server <- function(
     )
 
     message("Video finished")
-    react_values$dist_table <- emphazis::calculate_distances(
+    react_values$metrics_table <- emphazis::calculate_metrics(
       res_df = react_values$frames_output,
       fps = input$fps_slider
     )
@@ -340,9 +340,9 @@ server <- function(
 
   output$analysis_summary <- shiny::renderTable({
 
-    shiny::req(react_values$dist_table)
+    shiny::req(react_values$metrics_table)
 
-    emphazis::analysis_summary(react_values$dist_table)
+    emphazis::analysis_summary(react_values$metrics_table)
 
   })
 
@@ -350,11 +350,11 @@ server <- function(
   output$plot_track <- shiny::renderPlot({
 
     shiny::req(
-      react_values$dist_table
+      react_values$metrics_table
     )
 
     emphazis::plot_track(
-      dist_table = react_values$dist_table,
+      metrics_table = react_values$metrics_table,
       color = input$color_subject_1,
       range = input$frame_range
     )
@@ -363,57 +363,57 @@ server <- function(
   output$plot_track_heatmap <- shiny::renderPlot({
 
     shiny::req(
-      react_values$dist_table
+      react_values$metrics_table
     )
 
     emphazis::plot_track_heatmap(
-      dist_table = react_values$dist_table,
+      metrics_table = react_values$metrics_table,
       range = input$frame_range
     )
   })
 
   output$plot_dist <- shiny::renderPlot({
 
-    shiny::req(react_values$dist_table)
+    shiny::req(react_values$metrics_table)
 
     emphazis::plot_cumulative_distance(
-      dist_table = react_values$dist_table,
+      metrics_table = react_values$metrics_table,
       range = input$frame_range
     )
   })
 
   output$plot_speed <- shiny::renderPlot({
 
-    shiny::req(react_values$dist_table)
+    shiny::req(react_values$metrics_table)
 
     emphazis::plot_average_speed(
-      dist_table = react_values$dist_table,
+      metrics_table = react_values$metrics_table,
       range = input$frame_range
     )
   })
 
   # 3d Plots pane --------------------------------------------------------------
   output$plot_3d_dots <- plotly::renderPlotly({
-    shiny::req(react_values$dist_table)
+    shiny::req(react_values$metrics_table)
 
     emphazis::plot_3d_dots(
-      dist_table = react_values$dist_table,
+      metrics_table = react_values$metrics_table,
       size = 3
     )
 
   })
 
   output$plot_3d_lines <- plotly::renderPlotly({
-    shiny::req(react_values$dist_table)
+    shiny::req(react_values$metrics_table)
 
-    emphazis::plot_3d_lines(dist_table = react_values$dist_table)
+    emphazis::plot_3d_lines(metrics_table = react_values$metrics_table)
 
   })
 
   output$plot_3d_surface <- plotly::renderPlotly({
-    shiny::req(react_values$dist_table)
+    shiny::req(react_values$metrics_table)
 
-    emphazis::plot_3d_surface(dist_table = react_values$dist_table)
+    emphazis::plot_3d_surface(metrics_table = react_values$metrics_table)
 
   })
 

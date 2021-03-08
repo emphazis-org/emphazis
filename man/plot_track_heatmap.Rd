@@ -4,7 +4,7 @@
 \alias{plot_track_heatmap}
 \title{Plot tracking path density}
 \usage{
-plot_track_heatmap(dist_table, range = NULL)
+plot_track_heatmap(metrics_table, range = NULL)
 }
 \description{
 Plot tracking path density

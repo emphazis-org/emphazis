@@ -10,18 +10,18 @@ testthat::test_that("Prepare table", {
     -6L
   ), class = c("tbl_df", "tbl", "data.frame"))
 
-
-  dist_table_test <- calculate_distances(
+  metrics_table_test <- calculate_metrics(
     res_df = res_df_head,
+    conversion_rate = c(0.045, 0.055),
     fps = 5
   )
-  testthat::expect_equal(dplyr::pull(dist_table_test, dist_cm)[1], 0)
+  testthat::expect_equal(dplyr::pull(metrics_table_test, distance)[1], 0)
 
-  testthat::expect_equal(ncol(dist_table_test), 10)
+  testthat::expect_equal(ncol(metrics_table_test), 9)
 })
 
 testthat::test_that("Summary output", {
-  dist_table_head <- structure(list(frame = 1:6, time = c(
+  metrics_table_head <- structure(list(frame = 1:6, time = c(
     0, 0.333333333333333, 0.666666666666667,
     1, 1.33333333333333, 1.66666666666667
   ), distance = c(
@@ -55,7 +55,7 @@ testthat::test_that("Summary output", {
 
 
   summary_df_test <- analysis_summary(
-    dist_table = dist_table_head
+    metrics_table = metrics_table_head
   )
 
 

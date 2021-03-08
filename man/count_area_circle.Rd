@@ -4,13 +4,13 @@
 \alias{count_area_circle}
 \title{Count occurrences in circular area}
 \usage{
-count_area_circle(dist_table, diameter_px = 50)
+count_area_circle(metrics_table, diameter = 5)
 }
 \arguments{
-\item{dist_table}{Table containing position of the mass center of the object
+\item{metrics_table}{Table containing position of the mass center of the object
 per frame.}
 
-\item{diameter_px}{Area side length measured in pixels.}
+\item{diameter}{Circular area diameter around object.}
 }
 \description{
 Calculates how many times other points

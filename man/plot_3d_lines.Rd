@@ -4,7 +4,7 @@
 \alias{plot_3d_lines}
 \title{Plot 3d Track Lines}
 \usage{
-plot_3d_lines(dist_table)
+plot_3d_lines(metrics_table)
 }
 \description{
 Plot 3d Track Lines

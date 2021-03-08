@@ -4,7 +4,7 @@
 \alias{plot_3d_dots}
 \title{Plot 3d Track}
 \usage{
-plot_3d_dots(dist_table, size = 3)
+plot_3d_dots(metrics_table, size = 3)
 }
 \description{
 Plot 3d Track

@@ -4,7 +4,7 @@
 \alias{plot_3d_surface}
 \title{Plot 3d Track Surface}
 \usage{
-plot_3d_surface(dist_table)
+plot_3d_surface(metrics_table)
 }
 \description{
 Plot 3d Track Surface

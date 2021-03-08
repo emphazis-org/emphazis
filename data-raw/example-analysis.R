@@ -12,7 +12,8 @@ temp_frames_path <- fs::path_temp("frames")
 
 frames_path <- convert_video_to_image(
   video_path = video_path,
-  frames_path = fs::path_temp("frames2")
+  frames_path = fs::path_temp("frames2"),
+  fps = 5
 )
 frames_path[1]
 
@@ -33,28 +34,28 @@ frames_output <- proccess_video(
 )
 
 # Summarize data
-dist_table <- calculate_distances(frames_output)
+metrics_table <- calculate_metrics(frames_output)
 
-frame_range <- c(0, length(unique(dplyr::pull(dist_table, "frame"))))
+frame_range <- c(0, length(unique(dplyr::pull(metrics_table, "frame"))))
 
 # Plots
 p1 <- plot_track(
-  dist_table = dist_table,
+  metrics_table = metrics_table,
   color = "green",
   range = frame_range
 )
 
 p2 <- plot_track_heatmap(
-  dist_table = dist_table,
+  metrics_table = metrics_table,
   range = frame_range
 )
 
 p3 <- plot_cumulative_distance(
-  dist_table = dist_table,
+  metrics_table = metrics_table,
   range = frame_range
 )
 p4 <- plot_average_speed(
-  dist_table = dist_table,
+  metrics_table = metrics_table,
   range = frame_range
 )
 

@@ -1,11 +1,11 @@
 #' Plot 3d Track
 #'
 #' @export
-plot_3d_dots <- function(dist_table, size = 3) {
+plot_3d_dots <- function(metrics_table, size = 3) {
   `%>%` <- dplyr::`%>%`
 
   plot_3d_track <- plotly::plot_ly(
-    data = dist_table,
+    data = metrics_table,
     x = ~x_center, y = ~y_center, z = ~count,
     color = ~count,
     type = "scatter3d",
@@ -19,11 +19,11 @@ plot_3d_dots <- function(dist_table, size = 3) {
 #' Plot 3d Track Lines
 #'
 #' @export
-plot_3d_lines <- function(dist_table) {
+plot_3d_lines <- function(metrics_table) {
   `%>%` <- dplyr::`%>%`
 
   plot_3d_track <- plotly::plot_ly(
-    data = dist_table,
+    data = metrics_table,
     x = ~x_center,
     y = ~y_center,
     z = ~count,
@@ -37,11 +37,11 @@ plot_3d_lines <- function(dist_table) {
 #' Plot 3d Track Surface
 #'
 #' @export
-plot_3d_surface <- function(dist_table) {
+plot_3d_surface <- function(metrics_table) {
   `%>%` <- dplyr::`%>%`
 
    kernel_density <- MASS::kde2d(
-    dist_table$x_center, dist_table$y_center, n = 200
+    metrics_table$x_center, metrics_table$y_center, n = 200
   )
 
   plot_3d_track <- plotly::plot_ly(

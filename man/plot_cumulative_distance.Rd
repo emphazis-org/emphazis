@@ -5,7 +5,7 @@
 \title{Plot Cumulative distance
 Plot cumulative sum of distance traveled by the subject.}
 \usage{
-plot_cumulative_distance(dist_table, range = NULL)
+plot_cumulative_distance(metrics_table, range = NULL)
 }
 \description{
 Plot Cumulative distance

@@ -4,10 +4,12 @@
 \alias{analysis_summary}
 \title{Analysis summary}
 \usage{
-analysis_summary(dist_table)
+analysis_summary(metrics_table, unit = "cm")
 }
 \arguments{
-\item{dist_table}{Output from `calculate_distances`.}
+\item{metrics_table}{Output from `calculate_metrics()`.}
+
+\item{unit}{Unit to convert values from pixel.}
 }
 \description{
 prepare table summaries

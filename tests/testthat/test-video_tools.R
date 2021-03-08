@@ -29,10 +29,10 @@ testthat::test_that("Process video", {
 
   testthat::expect_gt(x_test$y_center[2], 100)
 
-  dist_table <- calculate_distances(x_test)
+  metrics_table <- calculate_metrics(x_test)
 
-  testthat::expect_equal(dist_table$mov_avg_speed[1], NA_integer_)
-  testthat::expect_equal(nrow(dist_table), length(fs::dir_ls(temp_frames_path)))
+  testthat::expect_equal(metrics_table$mov_avg_speed[1], NA_integer_)
+  testthat::expect_equal(nrow(metrics_table), length(fs::dir_ls(temp_frames_path)))
 
   y_test <- proccess_video(
     video_path = video_path,

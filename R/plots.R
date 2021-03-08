@@ -2,19 +2,19 @@
 #' Plot Cumulative distance
 #' Plot cumulative sum of distance traveled by the subject.
 #' @export
-plot_cumulative_distance <- function(dist_table, range = NULL) {
+plot_cumulative_distance <- function(metrics_table, range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
-  begin_x_axis <- min(dist_table$time)
-  end_x_axis <- max(dist_table$time)
+  begin_x_axis <- min(metrics_table$time)
+  end_x_axis <- max(metrics_table$time)
 
   if (!is.null(range)) {
-    dist_table <- dist_table %>%
+    metrics_table <- metrics_table %>%
       dplyr::filter(frame >= range[1] & frame <= range[2])
   }
 
-  dist_table %>%
+  metrics_table %>%
     ggplot2::ggplot() +
     ggplot2::geom_point(ggplot2::aes(
       x = .data[["time"]],
@@ -28,19 +28,19 @@ plot_cumulative_distance <- function(dist_table, range = NULL) {
 #' Plot average speed
 #' Plot cumulative sum of distance traveled by the subject.
 #' @export
-plot_average_speed <- function(dist_table, range = NULL) {
+plot_average_speed <- function(metrics_table, range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
-  begin_x_axis <- min(dist_table$time)
-  end_x_axis <- max(dist_table$time)
+  begin_x_axis <- min(metrics_table$time)
+  end_x_axis <- max(metrics_table$time)
 
   if (!is.null(range)) {
-    dist_table <- dist_table %>%
+    metrics_table <- metrics_table %>%
       dplyr::filter(frame >= range[1] & frame <= range[2])
   }
 
-  dist_table %>%
+  metrics_table %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
         x = .data[["time"]],
@@ -58,17 +58,17 @@ plot_average_speed <- function(dist_table, range = NULL) {
 #' Plot tracking path
 #' @export
 plot_track <- function(
-  dist_table, color = "purple", range = NULL
+  metrics_table, color = "purple", range = NULL
 ) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
   if (!is.null(range)) {
-    dist_table <- dist_table %>%
+    metrics_table <- metrics_table %>%
       dplyr::filter(frame >= range[1] & frame <= range[2])
   }
 
-  plot_res <- dist_table %>%
+  plot_res <- metrics_table %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
         x = .data[["x_center"]],
@@ -87,16 +87,16 @@ plot_track <- function(
 
 #' Plot tracking path density
 #' @export
-plot_track_heatmap <- function(dist_table, range = NULL) {
+plot_track_heatmap <- function(metrics_table, range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
   if (!is.null(range)) {
-    dist_table <- dist_table %>%
+    metrics_table <- metrics_table %>%
       dplyr::filter(frame >= range[1] & frame <= range[2])
   }
 
-  plot_res <- dist_table %>%
+  plot_res <- metrics_table %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
         x = .data[["x_center"]],

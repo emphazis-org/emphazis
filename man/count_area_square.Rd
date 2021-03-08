@@ -4,10 +4,10 @@
 \alias{count_area_square}
 \title{Count occurrences in square area}
 \usage{
-count_area_square(dist_table, side_px = 50)
+count_area_square(metrics_table, side_px = 50)
 }
 \arguments{
-\item{dist_table}{Table containing position of the mass center of the object
+\item{metrics_table}{Table containing position of the mass center of the object
 per frame.}
 
 \item{side_px}{Area side length measured in pixels.}
