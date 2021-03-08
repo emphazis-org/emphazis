@@ -7,7 +7,6 @@ pkg_deps <- c(
   "shinythemes",
   "shinycssloaders",
   "colourpicker",
-  #"shinyWidgets",
   "metathis"
 )
 

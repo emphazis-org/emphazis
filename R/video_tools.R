@@ -65,7 +65,9 @@ proccess_video <- function(
   `%>%` <- dplyr::`%>%`
 
   frames_vector <- convert_video_to_image(
-    video_path = video_path, frames_path = frames_path, fps = fps
+    video_path = video_path,
+    frames_path = frames_path,
+    fps = fps
   )
 
   first_frame <- EBImage::readImage(frames_vector[1])
