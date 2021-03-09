@@ -34,5 +34,38 @@ extract_matrix <- function(
     full_mat[sparse_mat_df$y[i], sparse_mat_df$x[i]] <- sparse_mat_df$z[i]
   }
   return(full_mat)
+}
 
+
+#' Count occurrences in square area
+#'
+#' Calculates how many times other points
+#'   happens in an area around the main point.
+#'
+#' @param metrics_table Table containing position of the mass center of the object
+#'   per frame.
+#' @param side_px Area side length measured in pixels.
+#' @export
+count_area_square <- function(metrics_table, side_px = 50) {
+  `%>%` <- dplyr::`%>%`
+  count_vector <- purrr::map_int(seq_len(nrow(metrics_table)), ~{
+    i <- .x
+    center_x <- dplyr::pull(metrics_table, "x_center")[i]
+    center_y <- dplyr::pull(metrics_table, "y_center")[i]
+    min_x <- center_x - side_px/2
+    max_x <- center_x + side_px/2
+    min_y <- center_y - side_px/2
+    max_y <- center_y + side_px/2
+
+    area_count <- metrics_table %>%
+      dplyr::filter(
+        x_center >= min_x & x_center <= max_x
+      ) %>%
+      dplyr::filter(
+        y_center >= min_y & y_center <= max_y
+      ) %>%
+      nrow()
+    return(area_count)
+  })
+  return(count_vector)
 }
