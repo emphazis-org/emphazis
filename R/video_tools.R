@@ -3,18 +3,19 @@
 #' @family video_tools
 #' @export
 convert_video_to_image <- function(video_path, frames_path, fps = 5) {
-
   if (fs::dir_exists(frames_path)) {
     fs::dir_delete(frames_path)
   }
 
-  invisible(capture.output({
-    video_images_vector <- av::av_video_images(
-      video = video_path,
-      destdir = frames_path,
-      format = "jpg",
-      fps = fps
-    )},
+  invisible(capture.output(
+    {
+      video_images_vector <- av::av_video_images(
+        video = video_path,
+        destdir = frames_path,
+        format = "jpg",
+        fps = fps
+      )
+    },
     type = "message"
   ))
   # TODO add interactive check for verbose output
@@ -42,8 +43,7 @@ extract_video_info <- function(video_path) {
     dplyr::bind_rows(
       tibble::tibble(var = "duration", value = as.character(
         round(video_info$duration, 2)
-      )
-      )
+      ))
     )
 }
 
@@ -59,13 +59,12 @@ extract_video_info <- function(video_path) {
 #' @family video_tools
 #' @export
 proccess_video <- function(
-  video_path,
-  subject_model,
-  frames_path,
-  coord1 = NULL,
-  coord2 = NULL,
-  fps = 5
-) {
+                           video_path,
+                           subject_model,
+                           frames_path,
+                           coord1 = NULL,
+                           coord2 = NULL,
+                           fps = 5) {
   `%>%` <- dplyr::`%>%`
 
   video_image_vector <- convert_video_to_image(
@@ -82,7 +81,6 @@ proccess_video <- function(
     area_x_max <- dim(first_frame@.Data)[1]
     area_y_min <- 0
     area_y_max <- dim(first_frame@.Data)[2]
-
   } else {
     area_x_min <- coord1[1]
     area_x_max <- coord2[1]

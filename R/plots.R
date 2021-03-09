@@ -70,8 +70,7 @@ plot_average_speed <- function(metrics_table, range = NULL) {
 #' Plot tracking path
 #' @export
 plot_track <- function(
-  metrics_table, color = "purple", range = NULL
-) {
+                       metrics_table, color = "purple", range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
@@ -121,7 +120,8 @@ plot_track_heatmap <- function(metrics_table, range = NULL) {
       mapping = ggplot2::aes(
         x = .data$x_center,
         y = .data$y_center
-      )) +
+      )
+    ) +
     ggplot2::stat_density_2d(
       ggplot2::aes(fill = ..density..),
       geom = "raster", contour = FALSE

@@ -4,7 +4,7 @@ subject_path <- fs::path_package("emphazis", "extdata", "subject.jpg")
 background_path <- fs::path_package("emphazis", "extdata", "background.jpg")
 model_test <- generate_subject_model(subject_path, background_path)
 
-#video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
+# video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
 video_path <- "data-raw/ives-data/movie_sample.mp4"
 
 temp_frames_path <- fs::path_temp("frames")
@@ -87,6 +87,3 @@ p4 <- plot_average_speed(
 
 library(patchwork)
 (p1 + p2 + plot_layout(widths = 4)) / (p3 + p4 + plot_layout(widths = 1))
-
-
-

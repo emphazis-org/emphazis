@@ -6,8 +6,7 @@
 #' @return tibble with additional attributes.
 #' @export
 calculate_metrics <- function(
-  position_table
-) {
+                              position_table) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 

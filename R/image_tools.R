@@ -8,12 +8,10 @@
 #' @family image_tools
 #' @export
 slice_image <- function(
-  image_path,
-  output_path,
-  coord1 = NULL,
-  coord2 = NULL
-) {
-
+                        image_path,
+                        output_path,
+                        coord1 = NULL,
+                        coord2 = NULL) {
   if (!fs::dir_exists(output_path)) {
     fs::dir_create(output_path)
   }
@@ -27,7 +25,6 @@ slice_image <- function(
     area_x_max <- dim(image_data)[1]
     area_y_min <- 0
     area_y_max <- dim(image_data)[2]
-
   } else {
     area_x_min <- coord1[1]
     area_x_max <- coord2[1]
@@ -61,11 +58,10 @@ slice_image <- function(
 #' @param dpi Dots Per Inch unit used for conversion.
 #' @export
 convert_image_size_unit <- function(
-  image_path,
-  width = NULL,
-  height = NULL,
-  dpi = NULL
-) {
+                                    image_path,
+                                    width = NULL,
+                                    height = NULL,
+                                    dpi = NULL) {
   if (isTRUE(is.null(width) & is.null(height) & is.null(dpi))) {
     rlang::abort(
       "Width and height need to be supplied.\nOptionally, a dpi value can be supplied instead."
@@ -73,12 +69,12 @@ convert_image_size_unit <- function(
   }
   if (is.null(height)) {
     image_width_px <- av::av_media_info(image_path)$video$width
-    width_conversion_value <- width/image_width_px
+    width_conversion_value <- width / image_width_px
     conversion_rate <- width_conversion_value
   }
   if (is.null(width)) {
     image_height_px <- av::av_media_info(image_path)$video$height
-    height_conversion_value <- height/image_height_px
+    height_conversion_value <- height / image_height_px
     conversion_rate <- height_conversion_value
   }
   if (isTRUE(is.null(width) & is.null(height))) {

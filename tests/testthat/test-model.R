@@ -6,5 +6,4 @@ testthat::test_that("Model", {
   testthat::expect_s3_class(model_test, "glm")
 
   testthat::expect_equal(model_test$family$family, "binomial")
-
 })

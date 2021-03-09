@@ -1,5 +1,4 @@
 testthat::test_that("Image slice", {
-
   video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
 
   frames_output <- convert_video_to_image(
@@ -28,7 +27,6 @@ testthat::test_that("Image slice", {
 })
 
 testthat::test_that("Image slice data", {
-
   video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
 
   frames_vector <- convert_video_to_image(
@@ -51,14 +49,12 @@ testthat::test_that("Image slice data", {
   # 1st dim = X starting from left
   # 2nd dim = Y starting from top
   arena_frame@.Data <- frame_data[0:arena_xmax, 0:(arena_ymax - 200), ]
-  #plot(arena_frame)
+  # plot(arena_frame)
 
   testthat::expect_equal(dim(arena_frame@.Data), c(848, 280, 3))
-
 })
 
 testthat::test_that("Full analysis with automated slices", {
-
   `%>%` <- dplyr::`%>%`
 
   video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
@@ -138,7 +134,6 @@ testthat::test_that("Full analysis with automated slices", {
 
 
 testthat::test_that("Missing conversion inputs", {
-
   testthat::expect_error(
     convert_image_size_unit(),
     regexp = "Width and height need to be supplied"
@@ -154,7 +149,6 @@ testthat::test_that("Missing conversion inputs", {
 
 
 testthat::test_that("Conversion values", {
-
   image_path <- fs::path_package("emphazis", "extdata", "background.jpg")
 
   conversion_rates <- convert_image_size_unit(
@@ -164,5 +158,4 @@ testthat::test_that("Conversion values", {
   )
 
   testthat::expect_equal(round(conversion_rates, 3), c(0.051, 0.044))
-
 })

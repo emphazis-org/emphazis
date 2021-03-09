@@ -13,11 +13,10 @@
 #'
 #' @export
 convert_table_unit <- function(
-  metrics_table,
-  conversion_rate_width = NULL,
-  conversion_rate_height = NULL,
-  unit = "cm"
-) {
+                               metrics_table,
+                               conversion_rate_width = NULL,
+                               conversion_rate_height = NULL,
+                               unit = "cm") {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
@@ -50,8 +49,7 @@ convert_table_unit <- function(
 #'
 #' @export
 analysis_summary <- function(
-  metrics_table
-) {
+                             metrics_table) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
@@ -60,7 +58,7 @@ analysis_summary <- function(
   summary_table <- metrics_table %>%
     dplyr::summarise(
       `Distance traveled (unit_to_print)` = sum(.data$distance),
-      `Average Speed (unit_to_print/s)` = mean(sum(.data$speed)/sum(.data$distance)),
+      `Average Speed (unit_to_print/s)` = mean(sum(.data$speed) / sum(.data$distance)),
       `Total time (s)` = max(.data$time),
       `Number of frames` = dplyr::n_distinct(.data$frame)
     ) %>%
@@ -100,20 +98,20 @@ count_area_circle <- function(metrics_table, diameter_pct = 5) {
 
 
   calc_dist <- function(x1, y1, x2, y2) {
-    base::sqrt(((x1 - x2)^2) + ((y2 - y1) ^ 2))
+    base::sqrt(((x1 - x2)^2) + ((y2 - y1)^2))
   }
-  count_vector <- purrr::map_int(seq_len(nrow(metrics_table)), ~{
+  count_vector <- purrr::map_int(seq_len(nrow(metrics_table)), ~ {
     i <- .x
     center_x <- dplyr::pull(metrics_table, "x_center")[i]
     center_y <- dplyr::pull(metrics_table, "y_center")[i]
-    dist_vec <- purrr::map_dbl(seq_len(nrow(metrics_table)), ~{
+    dist_vec <- purrr::map_dbl(seq_len(nrow(metrics_table)), ~ {
       j <- .x
       j_dist <- calc_dist(
         x1 = center_x, x2 = metrics_table$x_center[j],
         y1 = center_y, y2 = metrics_table$y_center[j]
       )
     })
-    area_count <- length(dist_vec[dist_vec <= (diameter/2)])
+    area_count <- length(dist_vec[dist_vec <= (diameter / 2)])
     return(area_count)
   })
   return(count_vector)

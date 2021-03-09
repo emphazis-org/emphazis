@@ -28,13 +28,13 @@ plot_3d_dots <- function(metrics_table, size = 3) {
 
   fig %>%
     plotly::layout(
-    title = "Layout options in a 3d scatter plot",
-    scene = list(
-      xaxis = list(title = "Cos"),
-      yaxis = list(title = "Sin"),
-      zaxis = list(title = "Z")
-    ))
-
+      title = "Layout options in a 3d scatter plot",
+      scene = list(
+        xaxis = list(title = "Cos"),
+        yaxis = list(title = "Sin"),
+        zaxis = list(title = "Z")
+      )
+    )
 }
 
 #' Plot 3d Track Lines
@@ -62,7 +62,6 @@ plot_3d_lines <- function(metrics_table) {
       )
     )
   return(plot_3d_track)
-
 }
 
 #' Plot 3d Track Surface
@@ -73,8 +72,9 @@ plot_3d_surface <- function(metrics_table) {
 
   unit_to_use <- attributes(metrics_table)$unit
 
-   kernel_density <- MASS::kde2d(
-    metrics_table$x_center, metrics_table$y_center, n = 200
+  kernel_density <- MASS::kde2d(
+    metrics_table$y_center, metrics_table$x_center,
+    n = 500
   )
 
   plot_3d_track <- plotly::plot_ly(

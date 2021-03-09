@@ -4,11 +4,10 @@
 #'
 #' @export
 extract_matrix <- function(
-  data_df,
-  x_col = "x_center",
-  y_col = "y_center",
-  val_col = "count"
-) {
+                           data_df,
+                           x_col = "x_center",
+                           y_col = "y_center",
+                           val_col = "count") {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
   sparse_mat_df <- data_df %>%
@@ -48,14 +47,14 @@ extract_matrix <- function(
 #' @export
 count_area_square <- function(metrics_table, side_px = 50) {
   `%>%` <- dplyr::`%>%`
-  count_vector <- purrr::map_int(seq_len(nrow(metrics_table)), ~{
+  count_vector <- purrr::map_int(seq_len(nrow(metrics_table)), ~ {
     i <- .x
     center_x <- dplyr::pull(metrics_table, "x_center")[i]
     center_y <- dplyr::pull(metrics_table, "y_center")[i]
-    min_x <- center_x - side_px/2
-    max_x <- center_x + side_px/2
-    min_y <- center_y - side_px/2
-    max_y <- center_y + side_px/2
+    min_x <- center_x - side_px / 2
+    max_x <- center_x + side_px / 2
+    min_y <- center_y - side_px / 2
+    max_y <- center_y + side_px / 2
 
     area_count <- metrics_table %>%
       dplyr::filter(
@@ -80,10 +79,9 @@ count_area_square <- function(metrics_table, side_px = 50) {
 #'
 #' @export
 rate_to_unit <- function(
-  image_path,
-  rate,
-  type
-) {
+                         image_path,
+                         rate,
+                         type) {
   image_info <- av::av_media_info(image_path)
   # type = "width"
   # rate <- 0.056

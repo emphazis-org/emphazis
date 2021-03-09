@@ -51,4 +51,3 @@ testthat::test_that("Process video", {
     dim(position_table_test_2), c(50, 2)
   )
 })
-

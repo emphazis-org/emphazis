@@ -18,8 +18,7 @@
 #' # emphazis_app()
 #' @export
 emphazis_app <- function(
-  host = "127.0.0.1", port = NULL, launch_browser = TRUE, test = FALSE
-) {
+                         host = "127.0.0.1", port = NULL, launch_browser = TRUE, test = FALSE) {
   if (isTRUE(test)) {
     return(message("Running test."))
   }
