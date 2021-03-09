@@ -172,8 +172,10 @@ ui <-  shiny::navbarPage(
 
         shiny::tags$div(
           shiny::tags$b("Video details"),
-          shiny::tableOutput(
-            outputId = "video_description"
+          shinycssloaders::withSpinner(
+            shiny::tableOutput(
+              outputId = "video_description"
+            )
           )
         )
       ),
@@ -184,8 +186,10 @@ ui <-  shiny::navbarPage(
         shiny::tags$div(
           shiny::tags$b("Video decomposed frame"),
           shiny::tags$br(),
-          shiny::imageOutput(
-            outputId = "input_first_frame"
+          shinycssloaders::withSpinner(
+            shiny::imageOutput(
+              outputId = "input_first_frame"
+            )
           )
         )
       )
@@ -213,8 +217,10 @@ ui <-  shiny::navbarPage(
           choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
           selected = 3
         ),
-        shiny::tableOutput(
-          "arena_coord_info"
+        shinycssloaders::withSpinner(
+          shiny::tableOutput(
+            "arena_coord_info"
+          )
         ),
         shiny::actionButton(
           "cut_arena_button","Apply slice"
@@ -279,8 +285,10 @@ ui <-  shiny::navbarPage(
 
         shiny::tags$div(
           shiny::tags$b("Sliced arena"),
-          shiny::imageOutput(
-            outputId = "sliced_arena"
+          shinycssloaders::withSpinner(
+            shiny::imageOutput(
+              outputId = "sliced_arena"
+            )
           )
         )
       )
@@ -308,8 +316,10 @@ ui <-  shiny::navbarPage(
           choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
           selected = 3
         ),
-        shiny::tableOutput(
-          "subject_coord_info"
+        shinycssloaders::withSpinner(
+          shiny::tableOutput(
+            "subject_coord_info"
+          )
         ),
         shiny::actionButton(
           "cut_subject_button","Apply slice"
@@ -327,10 +337,12 @@ ui <-  shiny::navbarPage(
 
         shiny::tags$div(
           shiny::tags$b("Selected subject"),
-          shiny::imageOutput(
-            outputId = "subject_select",
-            click = "subject_click",
-            brush = "subject_brush"
+          shinycssloaders::withSpinner(
+            shiny::imageOutput(
+              outputId = "subject_select",
+              click = "subject_click",
+              brush = "subject_brush"
+            )
           )
         ),
 
@@ -343,8 +355,10 @@ ui <-  shiny::navbarPage(
 
         shiny::tags$div(
           shiny::tags$b("Sliced subject"),
-          shiny::imageOutput(
-            outputId = "sliced_subject"
+          shinycssloaders::withSpinner(
+            shiny::imageOutput(
+              outputId = "sliced_subject"
+            )
           )
         )
       )
@@ -431,7 +445,9 @@ ui <-  shiny::navbarPage(
         #   id = "analysis_prog_bar", value = 0, total = 100
         # ),
         shiny::tags$br(),
-        shiny::tableOutput("analysis_summary")
+        shinycssloaders::withSpinner(
+          shiny::tableOutput("analysis_summary")
+        )
       )
     )
   ),
@@ -475,25 +491,29 @@ ui <-  shiny::navbarPage(
         ) %>%
           shiny::tagAppendAttributes(
             alt = "Tracking Plot of the arena"
-          ),
+          ) %>%
+          shinycssloaders::withSpinner(),
         shiny::plotOutput(
           "plot_track_heatmap"
         ) %>%
           shiny::tagAppendAttributes(
             alt = "Heatmap plot of the arena"
-          ),
+          ) %>%
+          shinycssloaders::withSpinner(),
         shiny::plotOutput(
           "plot_dist"
         ) %>%
           shiny::tagAppendAttributes(
             alt = "Plot of cumulative distance"
-          ),
+          ) %>%
+          shinycssloaders::withSpinner(),
         shiny::plotOutput(
           "plot_speed"
         ) %>%
           shiny::tagAppendAttributes(
             alt = "Plot of rolling average speed by time"
-          )
+          ) %>%
+          shinycssloaders::withSpinner()
       )
     )
   ),
@@ -516,13 +536,16 @@ ui <-  shiny::navbarPage(
       mainPanel = shiny::mainPanel(
         plotly::plotlyOutput(
           "plot_3d_dots"
-        ),
+        ) %>%
+          shinycssloaders::withSpinner(),
         plotly::plotlyOutput(
           "plot_3d_surface"
-        ),
+        ) %>%
+          shinycssloaders::withSpinner(),
         plotly::plotlyOutput(
           "plot_3d_lines"
-        )
+        ) %>%
+          shinycssloaders::withSpinner()
       )
     )
   ),
