@@ -43,7 +43,7 @@ testthat::test_that("Process video", {
     coord2 = c(1000, 1000)
   )
   testthat::expect_equal(
-   dim(y_test), c(50, 2)
+    dim(y_test), c(50, 2)
   )
 })
 

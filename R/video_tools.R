@@ -7,13 +7,19 @@ convert_video_to_image <- function(video_path, frames_path, fps = 5) {
   if (fs::dir_exists(frames_path)) {
     fs::dir_delete(frames_path)
   }
-  # av::av_log_level(set = "-8")
-  av::av_video_images(
-    video = video_path,
-    destdir = frames_path,
-    format = "jpg",
-    fps = fps
-  )
+
+  invisible(capture.output({
+    video_images_vector <- av::av_video_images(
+      video = video_path,
+      destdir = frames_path,
+      format = "jpg",
+      fps = fps
+    )},
+  type = "message"
+  ))
+  # TODO add interactive check for verbose output
+  # rlang::inform("Images from video extracted succesfully")
+  return(video_images_vector)
 }
 
 #' Convert video to image
@@ -36,12 +42,10 @@ extract_video_info <- function(video_path) {
     dplyr::bind_rows(
       tibble::tibble(var = "duration", value = as.character(
         round(video_info$duration, 2)
-        )
+      )
       )
     )
-
 }
-
 
 #' Extract data from video
 #'
@@ -55,22 +59,22 @@ extract_video_info <- function(video_path) {
 #' @family video_tools
 #' @export
 proccess_video <- function(
-   video_path,
-   subject_model,
-   frames_path,
-   coord1 = NULL,
-   coord2 = NULL,
-   fps = 5
+  video_path,
+  subject_model,
+  frames_path,
+  coord1 = NULL,
+  coord2 = NULL,
+  fps = 5
 ) {
   `%>%` <- dplyr::`%>%`
 
-  frames_vector <- convert_video_to_image(
+  video_image_vector <- convert_video_to_image(
     video_path = video_path,
     frames_path = frames_path,
     fps = fps
   )
 
-  first_frame <- EBImage::readImage(frames_vector[1])
+  first_frame <- EBImage::readImage(video_image_vector[1])
 
 
   if (isTRUE(is.null(coord1) & is.null(coord2))) {
@@ -86,13 +90,23 @@ proccess_video <- function(
     area_y_max <- coord2[2]
   }
 
-  max_width <- av::av_media_info(frames_vector[1])$video$width
-  max_heigth <- av::av_media_info(frames_vector[1])$video$height
+  max_width <- av::av_media_info(video_image_vector[1])$video$width
+  max_heigth <- av::av_media_info(video_image_vector[1])$video$height
   if (isTRUE(area_x_max >= max_width)) {
     area_x_max <- max_width
   }
   if (isTRUE(area_y_max >= max_heigth)) {
     area_y_max <- max_heigth
+  }
+  if (isTRUE(area_x_max < area_x_min)) {
+    rlang::abort(
+      "X value from coordinates 2, need to be greater than coordinates 1."
+    )
+  }
+  if (isTRUE(area_y_max < area_y_min)) {
+    rlang::abort(
+      "Y value from coordinates 2, need to be greater than coordinates 1."
+    )
   }
 
   area_x_range <- area_x_min:area_x_max
@@ -104,9 +118,10 @@ proccess_video <- function(
   im2@.Data <- maat
 
   # Progress bar count
-  prog_count <- progressr::progressor(along = frames_vector)
+  prog_count <- progressr::progressor(along = video_image_vector)
 
-  # frame_path = frames_vector[2]
+  # TODO remove testing infrastructure
+  # frame_path = video_image_vector[2]
   extract_values <- function(frame_path) {
     `%>%` <- dplyr::`%>%`
     first_frame <- EBImage::readImage(frame_path)
@@ -146,7 +161,7 @@ proccess_video <- function(
   }
 
   position_table <- purrr::map_dfr(
-    frames_vector,
+    video_image_vector,
     extract_values
   )
 

@@ -128,7 +128,9 @@ ui <-  shiny::navbarPage(
           shiny::tags$h2("Information"),
           shiny::tags$p(
             "You are currently running emphazis version: ",
-            shiny::tags$strong(as.character(utils::packageVersion("emphazis")))
+            shiny::tags$strong(
+              as.character(utils::packageVersion("emphazis"))
+            )
           )
         )
       )
@@ -406,7 +408,7 @@ ui <-  shiny::navbarPage(
           min = 0.1,
           max = NA,
           step = 0.1,
-          width = 1
+          width = "50%"
         ),
 
         shiny::numericInput(
@@ -416,7 +418,7 @@ ui <-  shiny::navbarPage(
           min = 0.1,
           max = NA,
           step = 0.1,
-          width = 1
+          width = "50%"
         ),
 
         shiny::radioButtons(

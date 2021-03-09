@@ -68,9 +68,8 @@ convert_image_size_unit <- function(
   unit = "cm"
 ) {
   if (isTRUE(is.null(width) & is.null(height) & is.null(dpi))) {
-    stop(
-      "width and height need to be supplied.\n",
-      "Optionally, a dpi value can be supplied instead."
+    rlang::abort(
+      "Width and height need to be supplied.\nOptionally, a dpi value can be supplied instead."
     )
   }
   # TODO implement conversion through dpi value

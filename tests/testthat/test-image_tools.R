@@ -141,7 +141,7 @@ testthat::test_that("Missing conversion inputs", {
 
   testthat::expect_error(
     convert_image_size_unit(),
-    regexp = "width and height need to be supplied"
+    regexp = "Width and height need to be supplied"
   )
   testthat::expect_error(
     convert_image_size_unit(

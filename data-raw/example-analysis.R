@@ -1,5 +1,5 @@
 # library(emphazis)
-
+library(dplyr)
 subject_path <- fs::path_package("emphazis", "extdata", "subject.jpg")
 background_path <- fs::path_package("emphazis", "extdata", "background.jpg")
 model_test <- generate_subject_model(subject_path, background_path)
@@ -10,31 +10,29 @@ video_path <- "data-raw/ives-data/movie_sample.mp4"
 temp_frames_path <- fs::path_temp("frames")
 
 
-frames_path <- convert_video_to_image(
+first_frame_path <- convert_video_to_image(
   video_path = video_path,
   frames_path = fs::path_temp("frames2"),
   fps = 5
 )
-frames_path[1]
+
+first_frame <- first_frame_path[1]
 
 n_frames <- av::av_video_info(video_path)$video$frames
 
-frames_path <- convert_video_to_image(
-  video_path = video_path,
-  frames_path = fs::path_temp("frames2"),
-  fps = (1/n_frames)*2
-)
 
-frames_output <- proccess_video(
+position_table <- proccess_video(
   video_path = video_path,
   frames_path = temp_frames_path,
   subject_model = model_test,
-  coord1 = c(285, 655),
-  coord2 = c(475, 20)
-)
+  coord1 = c(285, 20),
+  coord2 = c(475, 655),
+  fps = 3
+) %>%
+  progressr::with_progress()
 
 # Summarize data
-metrics_table <- calculate_metrics(frames_output)
+metrics_table <- calculate_metrics(position_table)
 
 frame_range <- c(0, length(unique(dplyr::pull(metrics_table, "frame"))))
 
@@ -59,9 +57,8 @@ p4 <- plot_average_speed(
   range = frame_range
 )
 
-
 library(patchwork)
-(p1 + p2) / (p3 + p4)
+(p1 + p2 + plot_layout(widths = 4)) / (p3 + p4 + plot_layout(widths = 1))
 
 
 

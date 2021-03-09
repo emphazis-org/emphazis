@@ -17,7 +17,7 @@ server <- function(
   react_values <- shiny::reactiveValues()
 
   react_values$subject_model <- NULL
-  react_values$frames_output <- NULL
+  react_values$position_table <- NULL
   react_values$metrics_table <- NULL
 
   # Upload panel
@@ -39,6 +39,12 @@ server <- function(
   react_values$subject_y2 <- 0
 
   react_values$arena_slice_path <- NULL
+
+
+  # Analysis panel
+  react_values$conversion_rate <- NULL
+  react_values$conversion_rate <- NULL
+
 
   # Update Interface based on inputs ------------------------------------------
 
@@ -281,6 +287,7 @@ server <- function(
 
     shiny::req(
       input$input_video,
+      input$fps_slider,
       # input$input_subject,
       react_values$arena_slice_path,
       react_values$subject_slice_path,
@@ -316,21 +323,25 @@ server <- function(
       detail = "This may take a while ...",
       value = 0,
       expr = {
-        react_values$frames_output <- emphazis::proccess_video(
+        react_values$position_table <- emphazis::proccess_video(
           video_path = video_path,
-          frames_path = temp_frames_path,
           subject_model = react_values$subject_model,
+          frames_path = temp_frames_path,
           coord1 = coord_1,
-          coord2 = coord_2
+          coord2 = coord_2,
+          fps = input$fps_slider
         )
       }
     )
+
+    print(react_values$position_table)
+    str(react_values$position_table)
     message("Video finished")
   })
 
   metrics_table_inputs <- shiny::reactive({
     list(
-      react_values$frames_output,
+      react_values$position_table,
       input$fps_slider,
       input$conversion_rate,
       input$conversion_unit_radio
@@ -340,17 +351,19 @@ server <- function(
   shiny::observeEvent(metrics_table_inputs(), {
 
     shiny::req(
-      react_values$frames_output,
+      react_values$position_table,
       input$fps_slider,
       input$conversion_rate
     )
 
     react_values$metrics_table <- emphazis::calculate_metrics(
-      position_table = react_values$frames_output,
+      position_table = react_values$position_table,
       fps = input$fps_slider,
       conversion_rate = input$conversion_rate
     )
 
+    print(react_values$metrics_table)
+    str(react_values$metrics_table)
     message("Metrics generated")
   })
 

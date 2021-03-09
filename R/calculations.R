@@ -15,6 +15,7 @@ calculate_metrics <- function(
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
+  fps <- as.numeric(fps)
   frame_time <- 1 / fps
 
   # TODO Define pixel to centimeter conversion rate value
@@ -25,7 +26,9 @@ calculate_metrics <- function(
   mov_avg <- function(x, n = 5) {
     stats::filter(x, base::rep(1 / n, n), sides = 2)
   }
-
+  if (!is.null(conversion_rate)) {
+    conversion_rate <- as.numeric(conversion_rate)
+  }
   if (is.null(conversion_rate)) {
     width_conversion_rate <- 1
     heigth_conversion_rate <- 1
@@ -37,6 +40,9 @@ calculate_metrics <- function(
     heigth_conversion_rate <- conversion_rate[2]
   }
 
+  # TODO remove testing infrasctruture
+  #str(position)
+
   position_table <- position_table %>%
     dplyr::mutate(
       x_center = pixel_to_unit(x_center, width_conversion_rate)
@@ -47,7 +53,9 @@ calculate_metrics <- function(
 
   dist_vector <- NULL
   for (i in 2:nrow(position_table)) {
-    dist_vector <- c(dist_vector, sqrt(sum((position_table[i - 1, ] - position_table[i, ])^2)))
+    dist_vector <- c(
+      dist_vector, sqrt(sum((position_table[i - 1, ] - position_table[i, ])^2))
+    )
   }
 
   metrics_table <- tibble::tibble(
