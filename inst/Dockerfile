@@ -1,7 +1,11 @@
 FROM rocker/r-ver:4.0.3
 RUN apt-get update \
   && apt-get install -y \
-  ffmpeg libicu-dev make libavfilter-dev \
+  ffmpeg \
+  libicu-dev \
+  make \
+  libavfilter-dev \
+  libxt-dev \
   && rm -rf /var/lib/apt/lists/*
 RUN echo "options(repos = c(REPO_NAME = 'https://packagemanager.rstudio.com/all/__linux__/focal/latest', download.file.method = 'libcurl')" >> /usr/local/lib/R/etc/Rprofile.site
 RUN R -e 'install.packages("remotes")'

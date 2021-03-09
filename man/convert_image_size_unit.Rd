@@ -12,6 +12,8 @@ convert_image_size_unit(image_path, width = NULL, height = NULL, dpi = NULL)
 \item{width}{Image width in centimeter.}
 
 \item{height}{Image height in centimeter.}
+
+\item{dpi}{Dots Per Inch unit used for conversion.}
 }
 \description{
 Convert image sizes to pixel from other units.

@@ -17,7 +17,7 @@ first_frame_path <- convert_video_to_image(
 )
 
 first_frame <- first_frame_path[1]
-
+# image_path <- first_frame
 n_frames <- av::av_video_info(video_path)$video$frames
 
 position_table <- proccess_video(
@@ -38,15 +38,22 @@ metrics_table <- calculate_metrics(
 )
 attributes(metrics_table)$unit
 
-conversion_rates <- convert_image_size_unit(
+conversion_rate_width <- convert_image_size_unit(
   image_path = first_frame,
   width = 21,
+  height = NULL
+)
+
+conversion_rate_height <- convert_image_size_unit(
+  image_path = first_frame,
+  width = NULL,
   height = 18
 )
-print(conversion_rates)
+
 converted_table <- convert_table_unit(
   metrics_table,
-  conversion_rate = conversion_rates,
+  conversion_rate_width = conversion_rate_width,
+  conversion_rate_height = conversion_rate_height,
   unit = "cm"
 )
 attributes(converted_table)$unit
