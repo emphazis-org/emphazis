@@ -69,3 +69,25 @@ count_area_square <- function(metrics_table, side_px = 50) {
   })
   return(count_vector)
 }
+
+#' Get measurements
+#'
+#' Get measurement values from pixel and conversion rate.
+#'
+#' @param image_path image path.
+#' @param rate conversion rate.
+#' @param type measurement type. "width" or "height".
+#'
+#' @export
+rate_to_unit <- function(
+  image_path,
+  rate,
+  type
+) {
+  image_info <- av::av_media_info(image_path)
+  # type = "width"
+  # rate <- 0.056
+  type_px <- image_info$video[[type]]
+  measurement_value <- rate * type_px
+  return(measurement_value)
+}
