@@ -3,7 +3,10 @@
 #' @description Convert units used to calculate metrics.
 #'
 #' @param metrics_table Output from `calculate_metrics()`.
-#' @param conversion_rate Default: NULL. Value of unit conversion rate.
+#' @param conversion_rate_width Default: NULL. Value of unit conversion rate.
+#'   If rate values differ from width and height, a length two numeric vector
+#'   with conversion rates for width and lengths can be supplied.
+#' @param conversion_rate_height Default: NULL. Value of unit conversion rate.
 #'   If rate values differ from width and height, a length two numeric vector
 #'   with conversion rates for width and lengths can be supplied.
 #' @param unit Unit to convert values from pixel.
@@ -11,35 +14,23 @@
 #' @export
 convert_table_unit <- function(
   metrics_table,
-  conversion_rate = NULL,
+  conversion_rate_width = NULL,
+  conversion_rate_height = NULL,
   unit = "cm"
 ) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
-  if (!is.null(conversion_rate)) {
-    conversion_rate <- as.numeric(conversion_rate)
-  }
-  if (is.null(conversion_rate)) {
-    width_conversion_rate <- 1
-    height_conversion_rate <- 1
-  } else if (isTRUE(length(conversion_rate == 1))) {
-    width_conversion_rate <- conversion_rate
-    height_conversion_rate <- conversion_rate
-  } else {
-    width_conversion_rate <- conversion_rate[1]
-    height_conversion_rate <- conversion_rate[2]
-  }
-  # TODO Define pixel to centimeter conversion rate value
+  # Define pixel to centimeter conversion rate value
   pixel_to_unit <- function(x, conversion_rate) {
     x * conversion_rate
   }
   position_table <- metrics_table %>%
     dplyr::mutate(
-      x_center = pixel_to_unit(.data$x_center, width_conversion_rate)
+      x_center = pixel_to_unit(.data$x_center, conversion_rate_width)
     ) %>%
     dplyr::mutate(
-      y_center = pixel_to_unit(.data$y_center, height_conversion_rate)
+      y_center = pixel_to_unit(.data$y_center, conversion_rate_height)
     ) %>%
     dplyr::select(c("x_center", "y_center"))
 

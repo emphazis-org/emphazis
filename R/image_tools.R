@@ -58,7 +58,7 @@ slice_image <- function(
 #' @param image_path Path to image.
 #' @param width Image width in centimeter.
 #' @param height Image height in centimeter.
-#' @inheritParams proccess_video
+#' @param dpi Dots Per Inch unit used for conversion.
 #' @export
 convert_image_size_unit <- function(
   image_path,
@@ -71,12 +71,19 @@ convert_image_size_unit <- function(
       "Width and height need to be supplied.\nOptionally, a dpi value can be supplied instead."
     )
   }
-  # TODO implement conversion through dpi value
-  image_width_px <- av::av_media_info(image_path)$video$width
-  image_height_px <- av::av_media_info(image_path)$video$height
+  if (is.null(height)) {
+    image_width_px <- av::av_media_info(image_path)$video$width
+    width_conversion_value <- width/image_width_px
+    conversion_rate <- width_conversion_value
+  }
+  if (is.null(width)) {
+    image_height_px <- av::av_media_info(image_path)$video$height
+    height_conversion_value <- height/image_height_px
+    conversion_rate <- height_conversion_value
+  }
+  if (isTRUE(is.null(width) & is.null(height))) {
+    conversion_rate <- 1 / dpi
+  }
 
-  width_conversion_value <- width/image_width_px
-  height_conversion_value <- height/image_height_px
-
-  return(c(width_conversion_value, height_conversion_value))
+  return(conversion_rate)
 }
