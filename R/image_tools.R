@@ -64,8 +64,7 @@ convert_image_size_unit <- function(
   image_path,
   width = NULL,
   height = NULL,
-  dpi = NULL,
-  unit = "cm"
+  dpi = NULL
 ) {
   if (isTRUE(is.null(width) & is.null(height) & is.null(dpi))) {
     rlang::abort(

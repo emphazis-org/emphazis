@@ -17,8 +17,8 @@ plot_cumulative_distance <- function(metrics_table, range = NULL) {
   metrics_table %>%
     ggplot2::ggplot() +
     ggplot2::geom_point(ggplot2::aes(
-      x = .data[["time"]],
-      y = .data[["cumulative_distance_cm"]]
+      x = .data$time,
+      y = .data$cumulative_distance
     )) +
     ggplot2::expand_limits(x = c(begin_x_axis, end_x_axis)) +
     ggplot2::expand_limits(x = 0, y = 0) +
@@ -43,8 +43,8 @@ plot_average_speed <- function(metrics_table, range = NULL) {
   metrics_table %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
-        x = .data[["time"]],
-        y = .data[["mov_avg_speed"]]
+        x = .data$time,
+        y = .data$mov_avg_speed
       )
     ) +
     ggplot2::geom_smooth() +
@@ -71,8 +71,8 @@ plot_track <- function(
   plot_res <- metrics_table %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
-        x = .data[["x_center"]],
-        y = .data[["y_center"]]
+        x = .data$x_center,
+        y = .data$y_center
       ),
     ) +
     ggplot2::geom_path(color = color) +
@@ -99,8 +99,8 @@ plot_track_heatmap <- function(metrics_table, range = NULL) {
   plot_res <- metrics_table %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
-        x = .data[["x_center"]],
-        y = .data[["y_center"]]
+        x = .data$x_center,
+        y = .data$y_center
       )) +
     ggplot2::stat_density_2d(
       ggplot2::aes(fill = ..density..),

@@ -165,5 +165,22 @@ proccess_video <- function(
     extract_values
   )
 
+  emphazis_version <- utils::packageVersion("emphazis")
+  unit_used <- "px"
+  analysis_date <- format(base::Sys.time(), "%y%m%d-%H%M%S-UTC", tz = "UTC")
+  base::attr(x = position_table, "emphazis_version") <- emphazis_version
+  base::attr(x = position_table, "unit") <- unit_used
+  base::attr(x = position_table, "fps") <- fps
+  base::attr(x = position_table, "analysis_date") <- analysis_date
+
+  arena_width_unit <- max(area_x_range) - min(area_x_range)
+  base::attr(x = position_table, "arena_width") <- arena_width_unit
+  arena_height_unit <- max(area_y_range) - min(area_y_range)
+  base::attr(x = position_table, "arena_height") <- arena_height_unit
+
+  # base::attr(x = position_table, "class") <- c(
+  #   class(position_table), "emphazis_tbl"
+  # )
+
   return(position_table)
 }

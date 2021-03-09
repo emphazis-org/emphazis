@@ -1,101 +1,75 @@
-#' Calculate Distances
+#' Convert Unit used by Metrics Table
 #'
-#' Calculate distances and cumulative distances from frame to frame.
-#' @param position_table Coordinate position of subject per frame.
+#' @description Convert units used to calculate metrics.
+#'
+#' @param metrics_table Output from `calculate_metrics()`.
 #' @param conversion_rate Default: NULL. Value of unit conversion rate.
 #'   If rate values differ from width and height, a length two numeric vector
 #'   with conversion rates for width and lengths can be supplied.
-#' @inheritParams proccess_video
+#' @param unit Unit to convert values from pixel.
+#'
 #' @export
-calculate_metrics <- function(
-  position_table,
-  fps = 5,
-  conversion_rate = NULL
+convert_table_unit <- function(
+  metrics_table,
+  conversion_rate = NULL,
+  unit = "cm"
 ) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
-  fps <- as.numeric(fps)
-  frame_time <- 1 / fps
-
-  # TODO Define pixel to centimeter conversion rate value
-  pixel_to_unit <- function(x, conversion_rate) {
-    x * conversion_rate
-  }
-
-  mov_avg <- function(x, n = 5) {
-    stats::filter(x, base::rep(1 / n, n), sides = 2)
-  }
   if (!is.null(conversion_rate)) {
     conversion_rate <- as.numeric(conversion_rate)
   }
   if (is.null(conversion_rate)) {
     width_conversion_rate <- 1
-    heigth_conversion_rate <- 1
+    height_conversion_rate <- 1
   } else if (isTRUE(length(conversion_rate == 1))) {
     width_conversion_rate <- conversion_rate
-    heigth_conversion_rate <- conversion_rate
+    height_conversion_rate <- conversion_rate
   } else {
     width_conversion_rate <- conversion_rate[1]
-    heigth_conversion_rate <- conversion_rate[2]
+    height_conversion_rate <- conversion_rate[2]
   }
-
-  # TODO remove testing infrasctruture
-  #str(position)
-
-  position_table <- position_table %>%
+  # TODO Define pixel to centimeter conversion rate value
+  pixel_to_unit <- function(x, conversion_rate) {
+    x * conversion_rate
+  }
+  position_table <- metrics_table %>%
     dplyr::mutate(
-      x_center = pixel_to_unit(x_center, width_conversion_rate)
+      x_center = pixel_to_unit(.data$x_center, width_conversion_rate)
     ) %>%
     dplyr::mutate(
-      y_center = pixel_to_unit(y_center, heigth_conversion_rate)
-    )
+      y_center = pixel_to_unit(.data$y_center, height_conversion_rate)
+    ) %>%
+    dplyr::select(c("x_center", "y_center"))
 
-  dist_vector <- NULL
-  for (i in 2:nrow(position_table)) {
-    dist_vector <- c(
-      dist_vector, sqrt(sum((position_table[i - 1, ] - position_table[i, ])^2))
-    )
-  }
+  attr(position_table, "unit") <- unit
 
-  metrics_table <- tibble::tibble(
-    time = c(0, seq(1, length(dist_vector)) / fps),
-    distance = c(0, dist_vector)
-  )
+  converted_table <- calculate_metrics(position_table = position_table)
 
-  metrics_table <- position_table %>%
-    dplyr::bind_cols(metrics_table) %>%
-    tibble::rowid_to_column(var = "frame") %>%
-    #dplyr::mutate(dist_cm = pixel_to_unit(.data$distance)) %>%
-    dplyr::mutate(cumulative_distance_cm = base::cumsum(.data$distance)) %>%
-    dplyr::mutate(speed = .data$distance / frame_time) %>%
-    dplyr::mutate(mov_avg_speed = mov_avg(.data$speed)) %>%
-    # dplyr::mutate(count_square = count_area_square(metrics_table, 50)) %>%
-    # TODO 5 pixel around subject is a good area around subject?
-    dplyr::mutate(count = count_area_circle(., 5 * width_conversion_rate))
-
-  return(metrics_table)
+  return(converted_table)
 }
 
 #' Analysis summary
 #'
 #' @description prepare table summaries
 #'
-#' @param metrics_table Output from `calculate_metrics()`.
-#' @param unit Unit to convert values from pixel.
+#' @param metrics_table Output from `calculate_metrics()`
+#'   or `convert_table_unit()`.
 #'
 #' @export
 analysis_summary <- function(
-  metrics_table,
-  unit = "cm"
+  metrics_table
 ) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
+
+  unit_to_replace <- attr(metrics_table, "unit")
+
   summary_table <- metrics_table %>%
     dplyr::summarise(
-      `Distance traveled (cm)` = sum(.data$distance),
-      # `Distance traveled (cm)` = sum(.data$dist_cm),
-      `Average Speed (cm/s)` = mean(sum(.data$speed)/sum(.data$distance)),
+      `Distance traveled (unit_to_print)` = sum(.data$distance),
+      `Average Speed (unit_to_print/s)` = mean(sum(.data$speed)/sum(.data$distance)),
       `Total time (s)` = max(.data$time),
       `Number of frames` = dplyr::n_distinct(.data$frame)
     ) %>%
@@ -104,40 +78,14 @@ analysis_summary <- function(
       names_to = "var"
     )
 
+  var_with_unit <- stringr::str_replace(
+    string = summary_table$var,
+    pattern = "unit_to_print",
+    replacement = unit_to_replace
+  )
+  summary_table <- dplyr::mutate(summary_table, var = var_with_unit)
+
   return(summary_table)
-}
-
-#' Count occurrences in square area
-#'
-#' Calculates how many times other points
-#'   happens in an area around the main point.
-#'
-#' @param metrics_table Table containing position of the mass center of the object
-#'   per frame.
-#' @param side_px Area side length measured in pixels.
-#' @export
-count_area_square <- function(metrics_table, side_px = 50) {
-  `%>%` <- dplyr::`%>%`
-  count_vector <- purrr::map_int(seq_len(nrow(metrics_table)), ~{
-    i <- .x
-    center_x <- dplyr::pull(metrics_table, "x_center")[i]
-    center_y <- dplyr::pull(metrics_table, "y_center")[i]
-    min_x <- center_x - side_px/2
-    max_x <- center_x + side_px/2
-    min_y <- center_y - side_px/2
-    max_y <- center_y + side_px/2
-
-    area_count <- metrics_table %>%
-      dplyr::filter(
-        x_center >= min_x & x_center <= max_x
-      ) %>%
-      dplyr::filter(
-        y_center >= min_y & y_center <= max_y
-      ) %>%
-      nrow()
-    return(area_count)
-  })
-  return(count_vector)
 }
 
 #' Count occurrences in circular area
@@ -147,10 +95,18 @@ count_area_square <- function(metrics_table, side_px = 50) {
 #'
 #' @param metrics_table Table containing position of the mass center of the object
 #'   per frame.
-#' @param diameter Circular area diameter around object.
+#' @param diameter_pct Circular area diameter around object.
 #' @export
-count_area_circle <- function(metrics_table, diameter = 5) {
+count_area_circle <- function(metrics_table, diameter_pct = 5) {
   `%>%` <- dplyr::`%>%`
+
+  # circle_area <- base::pi * (diameter / 2) ^ 2
+  arena_area <- `*`(
+    attr(metrics_table, "arena_width"),
+    attr(metrics_table, "arena_height")
+  )
+  diameter <- (sqrt(arena_area) / 100) * diameter_pct
+
 
   calc_dist <- function(x1, y1, x2, y2) {
     base::sqrt(((x1 - x2)^2) + ((y2 - y1) ^ 2))
@@ -170,4 +126,4 @@ count_area_circle <- function(metrics_table, diameter = 5) {
     return(area_count)
   })
   return(count_vector)
-}
+  }
