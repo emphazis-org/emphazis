@@ -4,12 +4,11 @@
 \alias{analysis_summary}
 \title{Analysis summary}
 \usage{
-analysis_summary(metrics_table, unit = "cm")
+analysis_summary(metrics_table)
 }
 \arguments{
-\item{metrics_table}{Output from `calculate_metrics()`.}
-
-\item{unit}{Unit to convert values from pixel.}
+\item{metrics_table}{Output from `calculate_metrics()`
+or `convert_table_unit()`.}
 }
 \description{
 prepare table summaries

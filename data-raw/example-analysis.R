@@ -20,7 +20,6 @@ first_frame <- first_frame_path[1]
 
 n_frames <- av::av_video_info(video_path)$video$frames
 
-
 position_table <- proccess_video(
   video_path = video_path,
   frames_path = temp_frames_path,
@@ -31,8 +30,30 @@ position_table <- proccess_video(
 ) %>%
   progressr::with_progress()
 
+attributes(position_table)
+
 # Summarize data
-metrics_table <- calculate_metrics(position_table)
+metrics_table <- calculate_metrics(
+  position_table = position_table
+)
+attributes(metrics_table)$unit
+
+conversion_rates <- convert_image_size_unit(
+  image_path = first_frame,
+  width = 21,
+  height = 18
+)
+print(conversion_rates)
+converted_table <- convert_table_unit(
+  metrics_table,
+  conversion_rate = conversion_rates,
+  unit = "cm"
+)
+attributes(converted_table)$unit
+
+analysis_summary(
+  metrics_table = converted_table
+)
 
 frame_range <- c(0, length(unique(dplyr::pull(metrics_table, "frame"))))
 

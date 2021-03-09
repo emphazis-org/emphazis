@@ -4,13 +4,7 @@
 \alias{convert_image_size_unit}
 \title{Convert image sizes}
 \usage{
-convert_image_size_unit(
-  image_path,
-  width = NULL,
-  height = NULL,
-  dpi = NULL,
-  unit = "cm"
-)
+convert_image_size_unit(image_path, width = NULL, height = NULL, dpi = NULL)
 }
 \arguments{
 \item{image_path}{Path to image.}
