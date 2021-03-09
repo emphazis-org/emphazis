@@ -16,10 +16,6 @@ server <- function(
   ### initial values, needed for reactivity ####
   react_values <- shiny::reactiveValues()
 
-  react_values$subject_model <- NULL
-  react_values$position_table <- NULL
-  react_values$metrics_table <- NULL
-
   # Upload panel
   react_values$first_frame_path <- NULL
 
@@ -38,13 +34,20 @@ server <- function(
   react_values$subject_x2 <- 0
   react_values$subject_y2 <- 0
 
-  react_values$arena_slice_path <- NULL
+  react_values$subject_slice_path <- NULL
 
 
-  # Analysis panel
-  react_values$conversion_rate <- NULL
-  react_values$conversion_rate <- NULL
+  # Statistics panel
+  react_values$subject_model <- NULL
+  react_values$position_table <- NULL
+  react_values$metrics_table <- NULL
+  react_values$converted_table <- NULL
 
+  react_values$conversion_rate_width <- NULL
+  react_values$conversion_rate_height <- NULL
+
+  react_values$arena_width_unit <- NULL
+  react_values$arena_height_unit <- NULL
 
   # Plots Panel
   react_values$max_frame_value <- NULL
@@ -265,21 +268,20 @@ server <- function(
   }, deleteFile = FALSE
   )
 
-  shiny::observeEvent(input$restart_arena_button, {
+  shiny::observeEvent(input$restart_subject_button, {
     react_values$subject_slice_path <- NULL
   })
 
-
   # Analysis panel -------------------------------------------------------------
-  shiny::observeEvent(input$start_job, {
+  shiny::observeEvent(input$start_job_button, {
 
     shiny::req(
       input$input_video,
       input$fps_slider,
       # input$input_subject,
+      # input$input_bg
       react_values$arena_slice_path,
       react_values$subject_slice_path,
-      # input$input_bg
     )
 
     message("Start analysis")
@@ -322,8 +324,8 @@ server <- function(
     )
 
     # TODO remove test infrastructure
-    print(react_values$position_table)
-    str(react_values$position_table)
+    # print(react_values$position_table)
+    # str(react_values$position_table)
     message("Video finished")
   })
 
@@ -333,63 +335,145 @@ server <- function(
       react_values$position_table,
     )
     react_values$metrics_table <- emphazis::calculate_metrics(
-      position_table = react_values$position_table,
+      position_table = react_values$position_table
     )
 
     # TODO remove test infrastructure
-    print(react_values$metrics_table)
-    str(react_values$metrics_table)
+    # print(react_values$metrics_table)
+    # str(react_values$metrics_table)
     message("Metrics generated")
 
+
+    # This is for plot frame slider
     react_values$max_frame_value <- max(react_values$metrics_table$frame)
   })
+  # ----------------------------------------------------------------------
+  # CONVERSION RATES
 
-   # HERE
-  conversion_rates <- emphazis::convert_image_size_unit(
-    image_path = react_values$first_frame_path,
-    width = input$arena_width,
-    height = input$arena_height,
-    dpi = NULL,
-    unit = input$u
-  )
-
-  # Unit conversion
-  unit_conversion_inputs <- shiny::reactive({
+  # Get conversion rate from measures
+  arena_measures_input <- shiny::reactive({
     list(
-      react_values$metrics_table,
-      input$conversion_rate,
-      input$conversion_unit_radio
+      input$arena_width,
+      input$arena_height
     )
   })
 
-  shiny::observeEvent(unit_conversion_inputs(), {
+  shiny::observeEvent(arena_measures_input(), {
+    shiny::req(
+      react_values$arena_slice_path
+    )
+    react_values$conversion_rate_width <- emphazis::convert_image_size_unit(
+      image_path = react_values$arena_slice_path,
+      width = input$arena_width,
+      height = NULL
+    )
+    react_values$conversion_rate_height <- emphazis::convert_image_size_unit(
+      image_path = react_values$arena_slice_path,
+      width = NULL,
+      height = input$arena_height
+    )
+    shiny::updateNumericInput(
+      session = session,
+      inputId = "conversion_rate_width",
+      value = round(react_values$conversion_rate_width, 4)
+    )
+    shiny::updateNumericInput(
+      session = session,
+      inputId = "conversion_rate_height",
+      value = round(react_values$conversion_rate_height, 4)
+    )
+    message("conversion measurements block end")
+  }, ignoreInit = TRUE
+  )
+
+  arena_rates_input <- shiny::reactive({
+    list(
+      input$conversion_rate_width,
+      input$conversion_rate_height
+    )
+  })
+  shiny::observeEvent(arena_rates_input(), {
+    shiny::req(
+      react_values$arena_slice_path
+    )
+    react_values$arena_width_unit <- emphazis::rate_to_unit(
+      image_path = react_values$arena_slice_path,
+      rate = input$conversion_rate_width,
+      type = "width"
+    )
+    react_values$arena_height_unit <- emphazis::rate_to_unit(
+      image_path = react_values$arena_slice_path,
+      rate = input$conversion_rate_height,
+      type = "height"
+    )
+    shiny::updateNumericInput(
+      session = session,
+      inputId = "arena_width",
+      value = react_values$arena_width_unit
+    )
+    shiny::updateNumericInput(
+      session = session,
+      inputId = "arena_height",
+      value = react_values$arena_height_unit
+    )
+    message("conversion rates block end")
+  }, ignoreInit = TRUE
+  )
+
+#   shiny::observeEvent(input$conversion_rate_width, {
+#     shiny::req(
+#       input$conversion_rate_width
+#     )
+#     react_values$conversion_rate_widtht <- input$conversion_rate_width
+#
+#     #print(react_values$conversion_rate_width)
+#     message("conversion measurements block end")
+#   })
+
+
+  #------------------------------------------------------------------
+  # Update summary table
+  shiny::observeEvent(input$update_summary_button, {
 
     shiny::req(
       react_values$metrics_table,
-      input$conversion_rate,
+      react_values$conversion_rate_width,
+      react_values$conversion_rate_height,
       input$conversion_unit_radio
     )
 
-    react_values$converted_table <- emphazis::convert_table_unit(
-      metrics_table
+    if (input$conversion_unit_radio == 1) {
+      unit_to_convert <- "cm"
+    } else if (input$conversion_unit_radio == 2) {
+      unit_to_convert <- "in"
+    } else if (input$conversion_unit_radio == 3) {
+      unit_to_convert <- "px"
+    }
 
+    react_values$converted_table <- emphazis::convert_table_unit(
+      metrics_table = react_values$metrics_table,
+      conversion_rate_width = react_values$conversion_rate_width,
+      conversion_rate_height = react_values$conversion_rate_height,
+      unit = unit_to_convert
     )
 
     # TODO remove test infrastructure
-    print(react_values$converted_table)
-    str(react_values$converted_table)
-    message("Unit converted")
-  })
+    # print(react_values$converted_table)
+    # str(react_values$converted_table)
+    message("Units converted")
 
 
-  output$analysis_summary <- shiny::renderTable({
+    output$analysis_summary <- shiny::renderTable({
 
-    shiny::req(react_values$converted_table)
+      shiny::req(react_values$converted_table)
 
-    emphazis::analysis_summary(
-      metrics_table = react_values$converted_table
-    )
-    message("Summary rendered")
+      message("Summary rendered")
+
+      emphazis::analysis_summary(
+        metrics_table = react_values$converted_table
+      )
+
+    })
   })
 
   # Plots pane -----------------------------------------------------------------
@@ -409,11 +493,11 @@ server <- function(
   output$plot_track <- shiny::renderPlot({
 
     shiny::req(
-      react_values$metrics_table
+      react_values$converted_table
     )
 
     emphazis::plot_track(
-      metrics_table = react_values$metrics_table,
+      metrics_table = react_values$converted_table,
       color = input$color_subject_1,
       range = input$frame_range
     )
@@ -422,57 +506,57 @@ server <- function(
   output$plot_track_heatmap <- shiny::renderPlot({
 
     shiny::req(
-      react_values$metrics_table
+      react_values$converted_table
     )
 
     emphazis::plot_track_heatmap(
-      metrics_table = react_values$metrics_table,
+      metrics_table = react_values$converted_table,
       range = input$frame_range
     )
   })
 
   output$plot_dist <- shiny::renderPlot({
 
-    shiny::req(react_values$metrics_table)
+    shiny::req(react_values$converted_table)
 
     emphazis::plot_cumulative_distance(
-      metrics_table = react_values$metrics_table,
+      metrics_table = react_values$converted_table,
       range = input$frame_range
     )
   })
 
   output$plot_speed <- shiny::renderPlot({
 
-    shiny::req(react_values$metrics_table)
+    shiny::req(react_values$converted_table)
 
     emphazis::plot_average_speed(
-      metrics_table = react_values$metrics_table,
+      metrics_table = react_values$converted_table,
       range = input$frame_range
     )
   })
 
   # 3d Plots pane --------------------------------------------------------------
   output$plot_3d_dots <- plotly::renderPlotly({
-    shiny::req(react_values$metrics_table)
+    shiny::req(react_values$converted_table)
 
     emphazis::plot_3d_dots(
-      metrics_table = react_values$metrics_table,
+      metrics_table = react_values$converted_table,
       size = 3
     )
 
   })
 
   output$plot_3d_lines <- plotly::renderPlotly({
-    shiny::req(react_values$metrics_table)
+    shiny::req(react_values$converted_table)
 
-    emphazis::plot_3d_lines(metrics_table = react_values$metrics_table)
+    emphazis::plot_3d_lines(metrics_table = react_values$converted_table)
 
   })
 
   output$plot_3d_surface <- plotly::renderPlotly({
-    shiny::req(react_values$metrics_table)
+    shiny::req(react_values$converted_table)
 
-    emphazis::plot_3d_surface(metrics_table = react_values$metrics_table)
+    emphazis::plot_3d_surface(metrics_table = react_values$converted_table)
 
   })
 

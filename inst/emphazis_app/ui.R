@@ -229,38 +229,8 @@ ui <-  shiny::navbarPage(
         shiny::actionButton(
           "restart_arena_button", "Restart"
         ),
-
+        shiny::tags$hr(),
         shiny::tags$br()
-        # shiny::sliderInput(
-        #   inputId = "slider_arena_x1",
-        #   min = 1, max = 100, step = 1, round = TRUE, value = 1,
-        #   label = "X1 Coord"
-        # ),
-        # shiny::sliderInput(
-        #   inputId = "slider_arena_y1",
-        #   min = 1, max = 100, step = 1, round = TRUE, value = 1,
-        #   label = "Y1 Coord"
-        # ),
-        # shiny::sliderInput(
-        #   inputId = "slider_arena_x2",
-        #   min = 1, max = 100, step = 1, round = TRUE, value = 100,
-        #   label = "X2 Coord"
-        # ),
-        # shiny::sliderInput(
-        #   inputId = "slider_arena_y2",
-        #   min = 1, max = 100, step = 1, round = TRUE, value = 100,
-        #   label = "Y2 Coord"
-        # )
-        # shiny::textInput(
-        #   inputId = "arena_width",
-        #   label = "Arena Width(mm)",
-        #   value = 1
-        # ),
-        # shiny::textInput(
-        #   inputId = "arena_length",
-        #   label = "Arena Length(mm)",
-        #   value = 1
-        # )
       ),
 
       # Main panel for image inputs
@@ -328,8 +298,24 @@ ui <-  shiny::navbarPage(
         shiny::actionButton(
           "restart_subject_button", "Restart"
         ),
+        shiny::tags$h3(
+          shiny::tags$em(
+            shiny::tags$strong(
+              "Start analysis"
+            )
+          )
+        ),
 
-        shiny::tags$br()
+        shiny::actionButton(
+          inputId = "start_job_button",
+          label = shiny::tags$em(
+            shiny::tags$b(
+              "Click to start analysis!"
+            )
+          ),
+          icon = shiny::icon("rocket")
+        ),
+
       ),
 
       # Main panel for image inputs
@@ -364,9 +350,10 @@ ui <-  shiny::navbarPage(
       )
     )
   ),
+
   # Analysis Panel ------------------------------------------------------
   shiny::tabPanel(
-    title = "Analysis",
+    title = "Summary statistics",
     shiny::sidebarLayout(
       sidebarPanel = shiny::sidebarPanel(
         width = 3,
@@ -383,22 +370,21 @@ ui <-  shiny::navbarPage(
         shiny::tags$h3(
           shiny::tags$em(
             shiny::tags$strong(
-              "Start analysis"
+              "Set unit parameters"
             )
           )
         ),
         shiny::tags$br(),
-
-        shiny::numericInput(
-          inputId = "conversion_rate",
-          label = shiny::tags$h5("Conversion rate (Unit to pixel)"),
-          value = 0.045,
-          min = 0.010,
-          max = NA,
-          step = 0.001,
-          width = NULL
+        shiny::radioButtons(
+          inputId = "conversion_unit_radio",
+          label = shiny::tags$h4("Unit to convert"),
+          choices = list(
+            "Centimeter (cm)" = 1,
+            "Inch (in)" = 2,
+            "Pixel (px)" = 3
+          ),
+          selected = 3
         ),
-
         shiny::numericInput(
           inputId = "arena_width",
           label = shiny::tags$em("Arena width (unit)"),
@@ -418,28 +404,39 @@ ui <-  shiny::navbarPage(
           step = 0.1,
           width = "50%"
         ),
-
-        shiny::radioButtons(
-          inputId = "conversion_unit_radio",
-          label = shiny::tags$h4("Unit to convert"),
-          choices = list(
-            "Centimeter (cm)" = 1,
-            "Inch (in)" = 2,
-            "Pixel (px)" = 3
-          ),
-          selected = 1
+        shiny::numericInput(
+          inputId = "conversion_rate_width",
+          label = shiny::tags$h5("Height conversion rate (Pixel to Unit)"),
+          value = 1.000,
+          min = 0.010,
+          max = NA,
+          step = 0.001,
+          width = "50%"
         ),
 
+        shiny::numericInput(
+          inputId = "conversion_rate_height",
+          label = shiny::tags$h5("Height conversion rate (Pixel to Unit)"),
+          value = 1.000,
+          min = 0.010,
+          max = NA,
+          step = 0.001,
+          width = "50%"
+        ),
+
+
         shiny::tags$br(),
-        # Button to start
+        # Button to update statistics
         shiny::actionButton(
-          "start_job", "Click to start!"
+          inputId = "update_summary_button",
+          label = "Update data!",
+          icon = shiny::icon("table")
         ),
         shiny::tags$hr()
       ),
 
       mainPanel = shiny::mainPanel(
-        shiny::tags$b("Video processing"),
+        shiny::tags$b("Summary table"),
         # shiny::tags$br(),
         # shinyWidgets::progressBar(
         #   id = "analysis_prog_bar", value = 0, total = 100
