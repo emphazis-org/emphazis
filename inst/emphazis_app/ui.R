@@ -94,6 +94,15 @@ ui <-  shiny::navbarPage(
           shiny::tags$hr(),
           shiny::tags$br(),
 
+          shiny::tags$h2("Workflow"),
+
+          shiny::tags$br(),
+          shiny::tags$p(
+            ""
+          ),
+          shiny::tags$br(),
+          shiny::tags$hr(),
+
           shiny::tags$h2("Motivation"),
 
           shiny::tags$br(),
@@ -111,7 +120,16 @@ ui <-  shiny::navbarPage(
           shiny::tags$br(),
 
           shiny::tags$p("This work is supported by FAPESP"),
-          shiny::tags$p("Grant number: 18/07098-0")
+          shiny::tags$p("Grant number: 18/07098-0"),
+
+          shiny::tags$br(),
+          shiny::tags$hr(),
+
+          shiny::tags$h2("Information"),
+          shiny::tags$p(
+            "You are currently running emphazis version: ",
+            shiny::tags$strong(as.character(utils::packageVersion("emphazis")))
+          )
         )
       )
     )
@@ -356,6 +374,49 @@ ui <-  shiny::navbarPage(
           )
         ),
         shiny::tags$br(),
+
+        shiny::numericInput(
+          inputId = "conversion_rate",
+          label = shiny::tags$h5("Conversion rate (Unit to pixel)"),
+          value = 0.045,
+          min = 0.010,
+          max = NA,
+          step = 0.001,
+          width = NULL
+        ),
+
+        shiny::numericInput(
+          inputId = "arena_width",
+          label = shiny::tags$em("Arena width (unit)"),
+          value = 1,
+          min = 0.1,
+          max = NA,
+          step = 0.1,
+          width = 1
+        ),
+
+        shiny::numericInput(
+          inputId = "arena_height",
+          label = shiny::tags$em("Arena height (unit)"),
+          value = 1,
+          min = 0.1,
+          max = NA,
+          step = 0.1,
+          width = 1
+        ),
+
+        shiny::radioButtons(
+          inputId = "conversion_unit_radio",
+          label = shiny::tags$h4("Unit to convert"),
+          choices = list(
+            "Centimeter (cm)" = 1,
+            "Inch (not working yet)" = 2,
+            "Pixel" = 3
+          ),
+          selected = 1
+        ),
+
+        shiny::tags$br(),
         # Button to start
         shiny::actionButton(
           "start_job", "Click to start!"
@@ -365,7 +426,7 @@ ui <-  shiny::navbarPage(
 
       mainPanel = shiny::mainPanel(
         shiny::tags$b("Video processing"),
-        #shiny::tags$br(),
+        # shiny::tags$br(),
         # shinyWidgets::progressBar(
         #   id = "analysis_prog_bar", value = 0, total = 100
         # ),

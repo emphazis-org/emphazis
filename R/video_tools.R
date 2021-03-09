@@ -86,6 +86,15 @@ proccess_video <- function(
     area_y_max <- coord2[2]
   }
 
+  max_width <- av::av_media_info(frames_vector[1])$video$width
+  max_heigth <- av::av_media_info(frames_vector[1])$video$height
+  if (isTRUE(area_x_max >= max_width)) {
+    area_x_max <- max_width
+  }
+  if (isTRUE(area_y_max >= max_heigth)) {
+    area_y_max <- max_heigth
+  }
+
   area_x_range <- area_x_min:area_x_max
   area_y_range <- area_y_min:area_y_max
 
