@@ -36,6 +36,7 @@ ui <-  shiny::navbarPage(
   shiny::tabPanel(
     title = "Welcome",
 
+    # HTML meta tags
     shiny::tags$head(
       # HTML <meta> tag
       metathis::meta() %>%
@@ -60,9 +61,6 @@ ui <-  shiny::navbarPage(
 
       # Add website favicon
       shiny::tags$link(rel = "icon", href = "icons/logo.png"),
-
-      # HTML meta tags
-
 
       # JS code for ggplot plot re-size
       shiny::tags$script(
@@ -426,8 +424,8 @@ ui <-  shiny::navbarPage(
           label = shiny::tags$h4("Unit to convert"),
           choices = list(
             "Centimeter (cm)" = 1,
-            "Inch (not working yet)" = 2,
-            "Pixel" = 3
+            "Inch (in)" = 2,
+            "Pixel (px)" = 3
           ),
           selected = 1
         ),
@@ -476,7 +474,9 @@ ui <-  shiny::navbarPage(
         shiny::tags$br(),
         # Button to start
         shiny::actionButton(
-          "update_slider", "Update slider"
+          inputId = "update_plots",
+          label = shiny::tags$em("Update Plots"),
+          icon = shiny::icon("chart-bar")
         ),
         shiny::tags$hr(),
         shiny::tags$br(),

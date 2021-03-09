@@ -46,20 +46,8 @@ server <- function(
   react_values$conversion_rate <- NULL
 
 
-  # Update Interface based on inputs ------------------------------------------
-
-  shiny::observeEvent(input$update_slider, {
-    if (!is.null(react_values$metrics_table)) {
-      max_slider_value <- length(
-        unique(dplyr::pull(react_values$metrics_table, "frame"))
-      )
-      shiny::updateSliderInput(
-        inputId = "frame_range",
-        max = max_slider_value,
-        value = c(1, max_slider_value)
-      )
-    }
-  })
+  # Plots Panel
+  react_values$max_frame_value <- NULL
 
   # Upload files pane --------------------------------------------------------
 
@@ -316,7 +304,6 @@ server <- function(
 
     video_path <- input$input_video$datapath
 
-
     temp_frames_path <- fs::path_temp("frames")
     progressr::withProgressShiny(
       message = "Calculation in progress",
@@ -334,54 +321,91 @@ server <- function(
       }
     )
 
+    # TODO remove test infrastructure
     print(react_values$position_table)
     str(react_values$position_table)
     message("Video finished")
   })
 
-  metrics_table_inputs <- shiny::reactive({
-    list(
+
+  shiny::observeEvent(react_values$position_table, {
+    shiny::req(
       react_values$position_table,
-      input$fps_slider,
+    )
+    react_values$metrics_table <- emphazis::calculate_metrics(
+      position_table = react_values$position_table,
+    )
+
+    # TODO remove test infrastructure
+    print(react_values$metrics_table)
+    str(react_values$metrics_table)
+    message("Metrics generated")
+
+    react_values$max_frame_value <- max(react_values$metrics_table$frame)
+  })
+
+   # HERE
+  conversion_rates <- emphazis::convert_image_size_unit(
+    image_path = react_values$first_frame_path,
+    width = input$arena_width,
+    height = input$arena_height,
+    dpi = NULL,
+    unit = input$u
+  )
+
+  # Unit conversion
+  unit_conversion_inputs <- shiny::reactive({
+    list(
+      react_values$metrics_table,
       input$conversion_rate,
       input$conversion_unit_radio
     )
   })
 
-  shiny::observeEvent(metrics_table_inputs(), {
-
-    shiny::req(
-      react_values$position_table,
-      input$fps_slider,
-      input$conversion_rate
-    )
-
-    react_values$metrics_table <- emphazis::calculate_metrics(
-      position_table = react_values$position_table,
-      fps = input$fps_slider,
-      conversion_rate = input$conversion_rate
-    )
-
-    print(react_values$metrics_table)
-    str(react_values$metrics_table)
-    message("Metrics generated")
-  })
-
-  output$analysis_summary <- shiny::renderTable({
+  shiny::observeEvent(unit_conversion_inputs(), {
 
     shiny::req(
       react_values$metrics_table,
+      input$conversion_rate,
       input$conversion_unit_radio
     )
 
-    emphazis::analysis_summary(
-      metrics_table = react_values$metrics_table,
-      unit = input$conversion_unit_radio
+    react_values$converted_table <- emphazis::convert_table_unit(
+      metrics_table
+
     )
 
+    # TODO remove test infrastructure
+    print(react_values$converted_table)
+    str(react_values$converted_table)
+    message("Unit converted")
+  })
+
+
+  output$analysis_summary <- shiny::renderTable({
+
+    shiny::req(react_values$converted_table)
+
+    emphazis::analysis_summary(
+      metrics_table = react_values$converted_table
+    )
+    message("Summary rendered")
   })
 
   # Plots pane -----------------------------------------------------------------
+
+  # Update Slider based on frame number
+  shiny::observeEvent(react_values$max_frame_value, {
+
+    req(react_values$max_frame_value)
+
+    shiny::updateSliderInput(
+      inputId = "frame_range",
+      max = react_values$max_frame_value,
+      value = c(1, react_values$max_frame_value)
+    )
+  })
+
   output$plot_track <- shiny::renderPlot({
 
     shiny::req(
