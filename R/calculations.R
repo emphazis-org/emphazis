@@ -126,4 +126,4 @@ count_area_circle <- function(metrics_table, diameter_pct = 5) {
     return(area_count)
   })
   return(count_vector)
-  }
+}

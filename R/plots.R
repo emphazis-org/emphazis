@@ -6,6 +6,8 @@ plot_cumulative_distance <- function(metrics_table, range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
 
+  unit_to_use <- attributes(metrics_table)$unit
+
   begin_x_axis <- min(metrics_table$time)
   end_x_axis <- max(metrics_table$time)
 
@@ -22,7 +24,11 @@ plot_cumulative_distance <- function(metrics_table, range = NULL) {
     )) +
     ggplot2::expand_limits(x = c(begin_x_axis, end_x_axis)) +
     ggplot2::expand_limits(x = 0, y = 0) +
-    ggplot2::theme_bw()
+    ggplot2::theme_bw() +
+    ggplot2::labs(
+      x = "Time (s)",
+      y = glue::glue("Distance travelled ({ unit_to_use })")
+    )
 }
 
 #' Plot average speed
@@ -31,6 +37,8 @@ plot_cumulative_distance <- function(metrics_table, range = NULL) {
 plot_average_speed <- function(metrics_table, range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
+
+  unit_to_use <- attributes(metrics_table)$unit
 
   begin_x_axis <- min(metrics_table$time)
   end_x_axis <- max(metrics_table$time)
@@ -52,7 +60,11 @@ plot_average_speed <- function(metrics_table, range = NULL) {
     ggplot2::expand_limits(x = c(begin_x_axis, end_x_axis)) +
     ggplot2::scale_y_continuous(expand = c(0, 0)) +
     ggplot2::expand_limits(x = 0, y = 0) +
-    ggplot2::theme_bw()
+    ggplot2::theme_bw() +
+    ggplot2::labs(
+      x = glue::glue("Time (s)"),
+      y = glue::glue("Rolling Average Speed ({ unit_to_use }/s)")
+    )
 }
 
 #' Plot tracking path
@@ -62,6 +74,8 @@ plot_track <- function(
 ) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
+
+  unit_to_use <- attributes(metrics_table)$unit
 
   if (!is.null(range)) {
     metrics_table <- metrics_table %>%
@@ -80,7 +94,11 @@ plot_track <- function(
     ggplot2::coord_fixed() +
     ggplot2::scale_y_continuous(expand = c(0, 0)) +
     ggplot2::expand_limits(x = 0, y = 0) +
-    ggplot2::theme(legend.position = "none")
+    ggplot2::theme(legend.position = "none") +
+    ggplot2::labs(
+      x = glue::glue("X ({ unit_to_use })"),
+      y = glue::glue("Y ({ unit_to_use })")
+    )
 
   return(plot_res)
 }
@@ -90,6 +108,8 @@ plot_track <- function(
 plot_track_heatmap <- function(metrics_table, range = NULL) {
   `%>%` <- dplyr::`%>%`
   .data <- rlang::.data
+
+  unit_to_use <- attributes(metrics_table)$unit
 
   if (!is.null(range)) {
     metrics_table <- metrics_table %>%
@@ -112,7 +132,10 @@ plot_track_heatmap <- function(metrics_table, range = NULL) {
     ggplot2::scale_x_continuous(expand = c(0, 0)) +
     ggplot2::scale_y_continuous(expand = c(0, 0)) +
     ggplot2::expand_limits(x = 0, y = 0) +
-    ggplot2::theme(legend.position = "none")
+    ggplot2::theme(legend.position = "none") +
+    ggplot2::labs(
+      x = glue::glue("X ({ unit_to_use })"),
+      y = glue::glue("Y ({ unit_to_use })")
+    )
   return(plot_res)
 }
-
