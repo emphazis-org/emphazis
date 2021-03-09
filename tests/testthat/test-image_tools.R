@@ -124,7 +124,7 @@ testthat::test_that("Full analysis with automated slices", {
   fs::dir_info(temp_frames_path)
 
   summary_test <- analysis_summary(
-    calculate_metrics(frames_output_test, fps = 5)
+    calculate_metrics(frames_output_test)
   )
 
   summary_test %>%
@@ -132,7 +132,7 @@ testthat::test_that("Full analysis with automated slices", {
     dplyr::pull("value") %>%
     testthat::expect_equal(46)
 
-  plot_test_x <- plot_track(calculate_metrics(frames_output_test, fps = 5))
+  plot_test_x <- plot_track(calculate_metrics(frames_output_test))
   testthat::expect_s3_class(plot_test_x, "ggplot")
 })
 
@@ -146,9 +146,7 @@ testthat::test_that("Missing conversion inputs", {
   testthat::expect_error(
     convert_image_size_unit(
       width = NULL,
-      height = NULL,
-      dpi = NULL,
-      unit = "cm"
+      height = NULL
     ),
     regexp = "Optionally, a dpi value can be supplied instead"
   )
@@ -162,9 +160,7 @@ testthat::test_that("Conversion values", {
   conversion_rates <- convert_image_size_unit(
     image_path = image_path,
     width = 21,
-    height = 21,
-    dpi = NULL,
-    unit = "cm"
+    height = 21
   )
 
   testthat::expect_equal(round(conversion_rates, 3), c(0.051, 0.044))

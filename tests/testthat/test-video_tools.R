@@ -9,14 +9,13 @@ testthat::test_that("Process video", {
 
   video_path <- fs::path_package("emphazis", "extdata", "sample_rec_10s.mp4")
   temp_frames_path <- fs::path_temp("frames")
-  # av::av_video_info(video_path)
-  # (xmin, ymin)
+
   coord1 <- c(285, 20)
-  # (xmax, ymax)
+
   coord2 <- c(650, 430)
 
   progressr::with_progress({
-    x_test <- proccess_video(
+    position_table_table <- proccess_video(
       video_path = video_path,
       frames_path = temp_frames_path,
       subject_model = model_test,
@@ -25,17 +24,23 @@ testthat::test_that("Process video", {
       fps = 3
     )
   })
-  testthat::expect_equal(nrow(x_test), length(fs::dir_ls(temp_frames_path)))
+  testthat::expect_equal(
+    nrow(position_table_table),
+    length(fs::dir_ls(temp_frames_path))
+  )
 
-  testthat::expect_gt(x_test$y_center[2], 100)
+  testthat::expect_gt(position_table_table$y_center[2], 100)
 
-  metrics_table <- calculate_metrics(x_test)
+  metrics_table <- calculate_metrics(position_table_table)
 
   testthat::expect_equal(metrics_table$mov_avg_speed[1], NA_integer_)
-  testthat::expect_equal(nrow(metrics_table), length(fs::dir_ls(temp_frames_path)))
+  testthat::expect_equal(
+    nrow(metrics_table),
+    length(fs::dir_ls(temp_frames_path))
+  )
 
   # coords bigger than image handled correctly
-  y_test <- proccess_video(
+  position_table_test_2 <- proccess_video(
     video_path = video_path,
     frames_path = temp_frames_path,
     subject_model = model_test,
@@ -43,7 +48,7 @@ testthat::test_that("Process video", {
     coord2 = c(1000, 1000)
   )
   testthat::expect_equal(
-    dim(y_test), c(50, 2)
+    dim(position_table_test_2), c(50, 2)
   )
 })
 
