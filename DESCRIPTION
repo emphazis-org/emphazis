@@ -1,8 +1,8 @@
 Type: Package
 Package: emphazis
 Title: Emphazis
-Version: 0.0.0.9005
-Author: Who wrote it
+Version: 0.0.0.9006
+Author: Emphazis authors
 Maintainer: Lucio Rezende Queiroz <luciorqueiroz@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.

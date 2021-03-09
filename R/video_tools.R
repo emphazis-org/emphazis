@@ -15,7 +15,7 @@ convert_video_to_image <- function(video_path, frames_path, fps = 5) {
       format = "jpg",
       fps = fps
     )},
-  type = "message"
+    type = "message"
   ))
   # TODO add interactive check for verbose output
   # rlang::inform("Images from video extracted succesfully")
@@ -91,12 +91,12 @@ proccess_video <- function(
   }
 
   max_width <- av::av_media_info(video_image_vector[1])$video$width
-  max_heigth <- av::av_media_info(video_image_vector[1])$video$height
+  max_height <- av::av_media_info(video_image_vector[1])$video$height
   if (isTRUE(area_x_max >= max_width)) {
     area_x_max <- max_width
   }
-  if (isTRUE(area_y_max >= max_heigth)) {
-    area_y_max <- max_heigth
+  if (isTRUE(area_y_max >= max_height)) {
+    area_y_max <- max_height
   }
   if (isTRUE(area_x_max < area_x_min)) {
     rlang::abort(
