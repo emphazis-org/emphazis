@@ -163,7 +163,7 @@ proccess_video <- function(
     extract_values
   )
 
-  emphazis_version <- utils::packageVersion("emphazis")
+  emphazis_version <- as.character(utils::packageVersion("emphazis"))
   unit_used <- "px"
   analysis_date <- format(base::Sys.time(), "%y%m%d-%H%M%S-UTC", tz = "UTC")
   base::attr(x = position_table, "emphazis_version") <- emphazis_version
