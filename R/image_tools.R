@@ -67,6 +67,13 @@ convert_image_size_unit <- function(
       "Width and height need to be supplied.\nOptionally, a dpi value can be supplied instead."
     )
   }
+
+  if (isTRUE(!is.null(width) & !is.null(height))) {
+    rlang::abort(
+      "You need to supply only `height` or `width` for each call of `convert_image_size_unit()`."
+    )
+  }
+
   if (is.null(height)) {
     image_width_px <- av::av_media_info(image_path)$video$width
     width_conversion_value <- width / image_width_px
