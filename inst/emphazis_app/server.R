@@ -13,6 +13,10 @@ server <- function(
   # options(shiny.maxRequestSize = 900*1024^2) 900MB?
   base::options(shiny.maxRequestSize = 900 * 1024 ^ 2)
 
+
+  # Style ggplot2, lattice, and base plot themes
+  thematic::thematic_shiny()
+
   ### initial values, needed for reactivity ####
   react_values <- shiny::reactiveValues()
 

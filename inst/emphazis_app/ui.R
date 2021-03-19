@@ -4,7 +4,9 @@
 
 pkg_deps <- c(
   "shiny",
-  "shinythemes",
+  # "shinythemes",
+  "bslib",
+  "thematic",
   "shinycssloaders",
   "colourpicker",
   "metathis"
@@ -30,7 +32,9 @@ base::options(spinner.size = 1, spinner.type = 5)
 
 ui <-  shiny::navbarPage(
   title = "EmphaZis",
-  theme = shinythemes::shinytheme("flatly"),
+
+  theme = bslib::bs_theme(bootswatch = "flatly", version = 4),
+  # theme = shinythemes::shinytheme("flatly"),
 
   ### WELCOME PAGE ----
   shiny::tabPanel(
