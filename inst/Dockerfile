@@ -42,6 +42,6 @@ RUN Rscript -e 'remotes::install_github("emphazis-org/emphazis@main", upgrade="n
 
 EXPOSE 3838
 
-CMD R -e "emphazis::emphazis_app(host = '0.0.0.0', port = 3838, launch.browser = FALSE)"
+CMD R -e "emphazis::emphazis_app(host = '0.0.0.0', port = 3838, launch_browser = FALSE)"
 
 #CMD R -e "shinyemphazis::run_app(host = '0.0.0.0', port = 3838, launch.browser = FALSE)"

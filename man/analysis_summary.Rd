@@ -7,8 +7,8 @@
 analysis_summary(metrics_table)
 }
 \arguments{
-\item{metrics_table}{Output from `calculate_metrics()`
-or `convert_table_unit()`.}
+\item{metrics_table}{Output from \code{calculate_metrics()}
+or \code{convert_table_unit()}.}
 }
 \description{
 prepare table summaries

@@ -14,5 +14,5 @@ tibble with additional attributes.
 }
 \description{
 Calculate distances traveled, cumulative distances, time,
-  and other metrics from frame to frame.
+and other metrics from frame to frame.
 }

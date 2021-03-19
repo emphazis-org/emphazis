@@ -16,7 +16,7 @@ proccess_video(
 \arguments{
 \item{video_path}{Path to video file.}
 
-\item{subject_model}{model generated from `generate_subject_model()`.}
+\item{subject_model}{model generated from \code{generate_subject_model()}.}
 
 \item{frames_path}{Path to save frames extracted from video.}
 

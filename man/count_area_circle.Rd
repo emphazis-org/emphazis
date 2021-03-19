@@ -14,5 +14,5 @@ per frame.}
 }
 \description{
 Calculates how many times other points
-  happens in an area around the main point.
+happens in an area around the main point.
 }

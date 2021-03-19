@@ -24,7 +24,7 @@ after the app is started. Defaults to true in interactive sessions only. This va
 this parameter can also be a function to call with the application's URL.}
 }
 \description{
-`emphazis_app` Automated tracking analysis for emphazis package.
+\code{emphazis_app} Automated tracking analysis for emphazis package.
 }
 \examples{
 

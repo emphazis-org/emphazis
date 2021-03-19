@@ -12,7 +12,7 @@ convert_table_unit(
 )
 }
 \arguments{
-\item{metrics_table}{Output from `calculate_metrics()`.}
+\item{metrics_table}{Output from \code{calculate_metrics()}.}
 
 \item{conversion_rate_width}{Default: NULL. Value of unit conversion rate.
 If rate values differ from width and height, a length two numeric vector
