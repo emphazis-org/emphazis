@@ -151,11 +151,28 @@ testthat::test_that("Missing conversion inputs", {
 testthat::test_that("Conversion values", {
   image_path <- fs::path_package("emphazis", "extdata", "background.jpg")
 
-  conversion_rates <- convert_image_size_unit(
+  convert_image_size_unit(
     image_path = image_path,
     width = 21,
     height = 21
+  ) %>%
+    testthat::expect_error(
+      "You need to supply only `height` or `width` for each call"
+    )
+
+  conversion_rate_w <- convert_image_size_unit(
+      image_path = image_path,
+      width = 21,
+      height = NULL
+    )
+
+  testthat::expect_equal(round(conversion_rate_w, 3), 0.051)
+
+  conversion_rate_h <- convert_image_size_unit(
+    image_path = image_path,
+    width = NULL,
+    height = 21
   )
 
-  testthat::expect_equal(round(conversion_rates, 3), c(0.051, 0.044))
+  testthat::expect_equal(round(conversion_rate_h, 3), 0.044)
 })

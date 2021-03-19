@@ -46,7 +46,8 @@ testthat::test_that("Summary output", {
 
   convert_table_unit(
     metrics_table = metrics_table_head,
-    conversion_rate = c(0.045, 0.032),
+    conversion_rate_width = 0.045,
+    conversion_rate_height = 0.032,
     unit = "cm"
   ) %>%
     analysis_summary() %>%
