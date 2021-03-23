@@ -51,12 +51,16 @@ extract_video_info <- function(video_path) {
 #'
 #' @description Extract data and frames from video.
 #' @param video_path Path to video file.
-#' @param subject_model model generated from `generate_subject_model()`.
+#' @param subject_model Model generated from `generate_subject_model()`,
+#' or path to folder with model files.
 #' @param frames_path Path to save frames extracted from video.
-#' @param coord1 length 2 vector with position of the top left point.
-#' @param coord2 length 2 vector with position of the bottom right point.
+#' @param coord1 Length 2 vector with position of the top left point.
+#' @param coord2 Length 2 vector with position of the bottom right point.
 #' @param fps default = 5; Frames per second to decompose video.
+#' @param method Default
+#'
 #' @family video_tools
+#'
 #' @export
 proccess_video <- function(
                            video_path,
@@ -64,17 +68,82 @@ proccess_video <- function(
                            frames_path,
                            coord1 = NULL,
                            coord2 = NULL,
-                           fps = 5) {
+                           fps = 5,
+                           method = "glm") {
   `%>%` <- dplyr::`%>%`
 
+  if (isTRUE(method == "glm")) {
+    position_table <- proccess_video_glm(
+      video_path,
+      subject_model,
+      frames_path,
+      coord1 = NULL,
+      coord2 = NULL,
+      fps = 5
+    )
+  }
+
+  if (isTRUE(method == "yolo")) {
+    if (!requireNamespace("emphaziscv", quietly = FALSE)) {
+      error_msg <- glue::glue_collapse(
+        x = c(
+          "`emphaziscv` package not installed.",
+          "Check documentaion on how to install."
+        ),
+        sep = "\n"
+      )
+      rlang::abort(error_msg)
+    }
+
+    position_table <- emphaziscv::proccess_video_yolo(
+      video_path = video_path,
+      subject_model = subject_model,
+      fps = fps
+    )
+  }
+
+  emphazis_version <- as.character(utils::packageVersion("emphazis"))
+  unit_used <- "px"
+  analysis_date <- format(base::Sys.time(), "%y%m%d-%H%M%S-UTC", tz = "UTC")
+  base::attr(x = position_table, "emphazis_version") <- emphazis_version
+  base::attr(x = position_table, "unit") <- unit_used
+  base::attr(x = position_table, "analysis_date") <- analysis_date
+
+  # arena_width_unit <- max(area_x_range) - min(area_x_range)
+  # base::attr(x = position_table, "arena_width") <- arena_width_unit
+  # arena_height_unit <- max(area_y_range) - min(area_y_range)
+  # base::attr(x = position_table, "arena_height") <- arena_height_unit
+
+  # base::attr(x = position_table, "class") <- c(
+  #   class(position_table), "emphazis_tbl"
+  # )
+
+  return(position_table)
+}
+
+#' @noRd
+proccess_video_glm <- function(
+  video_path,
+  subject_model,
+  frames_path,
+  coord1 = NULL,
+  coord2 = NULL,
+  fps = 5,
+  envir = parent.frame()
+) {
   video_image_vector <- convert_video_to_image(
     video_path = video_path,
     frames_path = frames_path,
     fps = fps
   )
 
+  # Progress bar count
+  prog_count <- progressr::progressor(
+    along = c(video_image_vector, 1,2),
+    envir = envir
+  )
+  prog_count()
   first_frame <- EBImage::readImage(video_image_vector[1])
-
 
   if (isTRUE(is.null(coord1) & is.null(coord2))) {
     area_x_min <- 0
@@ -87,6 +156,8 @@ proccess_video <- function(
     area_y_min <- coord1[2]
     area_y_max <- coord2[2]
   }
+
+  prog_count()
 
   max_width <- av::av_media_info(video_image_vector[1])$video$width
   max_height <- av::av_media_info(video_image_vector[1])$video$height
@@ -115,11 +186,7 @@ proccess_video <- function(
   maat <- first_frame@.Data[area_x_range, area_y_range, ]
   im2@.Data <- maat
 
-  # Progress bar count
-  prog_count <- progressr::progressor(along = video_image_vector)
 
-  # TODO remove testing infrastructure
-  # frame_path = video_image_vector[2]
   extract_values <- function(frame_path) {
     `%>%` <- dplyr::`%>%`
     first_frame <- EBImage::readImage(frame_path)
@@ -163,22 +230,11 @@ proccess_video <- function(
     extract_values
   )
 
-  emphazis_version <- as.character(utils::packageVersion("emphazis"))
-  unit_used <- "px"
-  analysis_date <- format(base::Sys.time(), "%y%m%d-%H%M%S-UTC", tz = "UTC")
-  base::attr(x = position_table, "emphazis_version") <- emphazis_version
-  base::attr(x = position_table, "unit") <- unit_used
-  base::attr(x = position_table, "fps") <- fps
-  base::attr(x = position_table, "analysis_date") <- analysis_date
-
   arena_width_unit <- max(area_x_range) - min(area_x_range)
   base::attr(x = position_table, "arena_width") <- arena_width_unit
   arena_height_unit <- max(area_y_range) - min(area_y_range)
   base::attr(x = position_table, "arena_height") <- arena_height_unit
-
-  # base::attr(x = position_table, "class") <- c(
-  #   class(position_table), "emphazis_tbl"
-  # )
+  base::attr(x = position_table, "fps") <- fps
 
   return(position_table)
 }

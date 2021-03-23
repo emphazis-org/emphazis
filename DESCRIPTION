@@ -1,11 +1,11 @@
 Type: Package
 Package: emphazis
-Title: Emphazis
-Version: 0.0.0.9010
+Title: Emphazis - Zebrafish tracking made simple
+Version: 0.0.0.9011
 Author: Emphazis authors
 Maintainer: Lucio Rezende Queiroz <luciorqueiroz@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Computational vision tracking tailored for zebrafish
+    tracking studies.
 License:
 biocViews:
 Imports: 
@@ -23,7 +23,8 @@ Imports:
     plotly,
     MASS,
     rlang,
-    progressr
+    progressr,
+    emphaziscv (>= 0.0.0.9001)
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -31,3 +32,5 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
+Remotes:  
+    emphazis-org/emphaziscv
