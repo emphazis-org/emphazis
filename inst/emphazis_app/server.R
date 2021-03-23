@@ -282,7 +282,6 @@ server <- function(
     shiny::req(
       input$input_video,
       input$fps_slider,
-      input$cv_method,
       # input$input_subject,
       # input$input_bg
       react_values$arena_slice_path,
@@ -367,6 +366,39 @@ server <- function(
     # This is for plot frame slider
     react_values$max_frame_value <- max(react_values$metrics_table$frame)
   })
+
+
+
+  # Analysis timer ----------------------
+  timer <- shiny::reactiveVal(0)
+  is_active_timer <- shiny::reactiveVal(FALSE)
+  output$time_passed <- shiny::renderText({
+    paste("Time passed:", lubridate::seconds_to_period(timer()))
+  })
+  # observer that invalidates every second. If timer is active, increase by one.
+  shiny::observe({
+    shiny::invalidateLater(1000, session)
+    shiny::isolate({
+      if (is_active_timer()) {
+        timer(timer() + 1)
+        if (!is.null(react_values$metrics_table)) {
+          is_active_timer(FALSE)
+          shiny::showModal(
+            ui = shiny::modalDialog(
+              title = "Important message",
+              "Analysis completed!"
+            )
+          )
+        }
+      }
+    })
+  })
+
+  shiny::observeEvent(input$start_job_button, {
+    is_active_timer(TRUE)
+  })
+
+
   # ----------------------------------------------------------------------
   # CONVERSION RATES
 

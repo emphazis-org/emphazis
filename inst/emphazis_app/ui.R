@@ -140,246 +140,259 @@ ui <-  shiny::navbarPage(
 
   # Upload panel ------------------------------------------------
   shiny::tabPanel(
-    title = "Upload files",
-    shiny::sidebarLayout(
-      sidebarPanel = shiny::sidebarPanel(
-        width = 3,
-        shiny::tags$h3(
-          shiny::tags$em(
-            shiny::tags$strong(
-              "Upload video"
-            )
-          )
-        ),
+    title = "Analysis",
+    shiny::tabsetPanel(
+      shiny::tabPanel(
+        title = "Upload files",
+        shiny::sidebarLayout(
+          sidebarPanel = shiny::sidebarPanel(
+            width = 3,
+            shiny::tags$h3(
+              shiny::tags$em(
+                shiny::tags$strong(
+                  "Upload video"
+                )
+              )
+            ),
 
-        shiny::tags$br(),
-        # Video Input
-        shiny::fileInput(
-          inputId = "input_video",
-          label = "Choose Video File",
-          multiple = FALSE,
-          accept = c("video/*")
-        ),
-        # Horizontal line ----
-        shiny::tags$hr(),
-        # Select method
-        shiny::selectInput(
-          inputId = "analysis_method",
-          label = shiny::tags$h3(
-            shiny::tags$em("Select Analysis Method")
-          ),
-          choices = c(GLM = "glm", YOLO = "yolo"),
-          selected = "glm"
-        ),
-        shiny::tags$hr(),
+            shiny::tags$br(),
+            # Video Input
+            shiny::fileInput(
+              inputId = "input_video",
+              label = "Choose Video File",
+              multiple = FALSE,
+              accept = c("video/*")
+            ),
+            # Horizontal line ----
+            shiny::tags$hr(),
+            # Select method
+            shiny::selectInput(
+              inputId = "analysis_method",
+              label = shiny::tags$h3(
+                shiny::tags$em("Select Analysis Method")
+              ),
+              choices = c(GLM = "glm", YOLO = "yolo"),
+              selected = "glm"
+            ),
+            shiny::tags$hr(),
 
-        # # GLM options
-        # shiny::conditionalPanel(
-        #   condition = "input.analysis_method == 'glm'",
-        #   shiny::selectInput(
-        #     "breaks", "Breaks",
-        #     c("Sturges", "Scott", "Freedman-Diaconis", "[Custom]" = "custom")
-        #   ),
-        #
-        #   # Only show this panel if yolo is selected
-        #   shiny::conditionalPanel(
-        #     condition = "input.analysis_method == 'yolo'",
-        #     shiny::sliderInput("breakCount", "Break Count", min = 1, max = 50, value = 10)
-        #   )
-        # ),
+            # # GLM options
+            # shiny::conditionalPanel(
+            #   condition = "input.analysis_method == 'glm'",
+            #   shiny::selectInput(
+            #     "breaks", "Breaks",
+            #     c("Sturges", "Scott", "Freedman-Diaconis", "[Custom]" = "custom")
+            #   ),
+            #
+            #   # Only show this panel if yolo is selected
+            #   shiny::conditionalPanel(
+            #     condition = "input.analysis_method == 'yolo'",
+            #     shiny::sliderInput("breakCount", "Break Count", min = 1, max = 50, value = 10)
+            #   )
+            # ),
 
-        shiny::sliderInput(
-          inputId = "fps_slider",
-          min = 1, max = 24, step = 1,
-          round = TRUE, value = 5,
-          label = "Choose Frames per Second"
-        ),
+            shiny::sliderInput(
+              inputId = "fps_slider",
+              min = 1, max = 24, step = 1,
+              round = TRUE, value = 5,
+              label = "Choose Frames per Second"
+            ),
 
-        shiny::actionButton(
-          inputId = "run_video_process",
-          label = "Decompose video",
-          icon = shiny::icon("film")
-        ),
+            shiny::actionButton(
+              inputId = "run_video_process",
+              label = "Decompose video",
+              icon = shiny::icon("film")
+            ),
 
-        shiny::tags$div(
-          shiny::tags$b("Video details"),
-          shinycssloaders::withSpinner(
-            shiny::tableOutput(
-              outputId = "video_description"
-            )
-          )
-        )
-      ),
-
-      # Main panel for image inputs
-      mainPanel = shiny::mainPanel(
-        shiny::tags$div(
-          shiny::tags$b("Video decomposed frame"),
-          shiny::tags$br(),
-          shinycssloaders::withSpinner(
-            shiny::imageOutput(
-              outputId = "input_first_frame"
-            )
-          )
-        )
-      )
-    )
-  ),
-
-  # Arena selection panel ------------------------------------------------
-  shiny::tabPanel(
-    title = "Arena settings",
-    shiny::sidebarLayout(
-      sidebarPanel = shiny::sidebarPanel(
-        width = 3,
-        shiny::tags$h3(
-          shiny::tags$em(
-            shiny::tags$strong(
-              "Arena selection"
-            )
-          )
-        ),
-        shiny::tags$hr(),
-        # Copy the line below to make a set of radio buttons
-        shiny::radioButtons(
-          inputId = "arena_coord_radio",
-          label = shiny::tags$h3("Coord to select"),
-          choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
-          selected = 3
-        ),
-        shinycssloaders::withSpinner(
-          shiny::tableOutput(
-            "arena_coord_info"
-          )
-        ),
-        shiny::actionButton(
-          "cut_arena_button","Apply slice"
-        ),
-
-        shiny::actionButton(
-          "restart_arena_button", "Restart"
-        ),
-        shiny::tags$hr(),
-        shiny::tags$br()
-      ),
-
-      # Main panel for image inputs
-      mainPanel = shiny::mainPanel(
-
-        shiny::tags$div(
-          shiny::tags$b("Selected arena"),
-          shiny::imageOutput(
-            outputId = "input_cut_frame",
-            click = "arena_click",
-            brush = "arena_brush"
-          )
-        ),
-
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
-
-
-        shiny::tags$div(
-          shiny::tags$b("Sliced arena"),
-          shinycssloaders::withSpinner(
-            shiny::imageOutput(
-              outputId = "sliced_arena"
-            )
-          )
-        )
-      )
-    )
-  ),
-
-  # Subject selection Panel ---------------------------------------------
-  shiny::tabPanel(
-    title = "Subject settings",
-    shiny::sidebarLayout(
-      sidebarPanel = shiny::sidebarPanel(
-        width = 3,
-        shiny::tags$h3(
-          shiny::tags$em(
-            shiny::tags$strong(
-              "Subject selection"
-            )
-          )
-        ),
-        shiny::tags$hr(),
-        # Copy the line below to make a set of radio buttons
-        shiny::radioButtons(
-          inputId = "subject_coord_radio",
-          label = shiny::tags$h3("Coord to select"),
-          choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
-          selected = 3
-        ),
-        shinycssloaders::withSpinner(
-          shiny::tableOutput(
-            "subject_coord_info"
-          )
-        ),
-        shiny::actionButton(
-          "cut_subject_button","Apply slice"
-        ),
-
-        shiny::actionButton(
-          "restart_subject_button", "Restart"
-        ),
-        shiny::tags$h3(
-          shiny::tags$em(
-            shiny::tags$strong(
-              "Start analysis"
-            )
-          )
-        ),
-        shiny::actionButton(
-          inputId = "start_job_button",
-          label = shiny::tags$em(
-            shiny::tags$b(
-              "Click to start analysis!"
+            shiny::tags$div(
+              shiny::tags$b("Video details"),
+              shinycssloaders::withSpinner(
+                shiny::tableOutput(
+                  outputId = "video_description"
+                )
+              )
             )
           ),
-          icon = shiny::icon("rocket")
-        ),
 
-      ),
-
-      # Main panel for image inputs
-      mainPanel = shiny::mainPanel(
-
-        shiny::tags$div(
-          shiny::tags$b("Selected subject"),
-          shinycssloaders::withSpinner(
-            shiny::imageOutput(
-              outputId = "subject_select",
-              click = "subject_click",
-              brush = "subject_brush"
+          # Main panel for image inputs
+          mainPanel = shiny::mainPanel(
+            shiny::tags$div(
+              shiny::tags$b("Video decomposed frame"),
+              shiny::tags$br(),
+              shinycssloaders::withSpinner(
+                shiny::imageOutput(
+                  outputId = "input_first_frame"
+                )
+              )
             )
           )
-        ),
+        )
+      ),
 
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
-        shiny::tags$br(),
+      # Arena selection panel ------------------------------------------------
+      shiny::tabPanel(
+        title = "Arena settings",
+        shiny::sidebarLayout(
+          sidebarPanel = shiny::sidebarPanel(
+            width = 3,
+            shiny::tags$h3(
+              shiny::tags$em(
+                shiny::tags$strong(
+                  "Arena selection"
+                )
+              )
+            ),
+            shiny::tags$hr(),
+            # Copy the line below to make a set of radio buttons
+            shiny::radioButtons(
+              inputId = "arena_coord_radio",
+              label = shiny::tags$h3("Coord to select"),
+              choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
+              selected = 3
+            ),
+            shinycssloaders::withSpinner(
+              shiny::tableOutput(
+                "arena_coord_info"
+              )
+            ),
+            shiny::actionButton(
+              "cut_arena_button","Apply slice"
+            ),
 
-        shiny::tags$div(
-          shiny::tags$b("Sliced subject"),
-          shinycssloaders::withSpinner(
-            shiny::imageOutput(
-              outputId = "sliced_subject"
+            shiny::actionButton(
+              "restart_arena_button", "Restart"
+            ),
+            shiny::tags$hr(),
+            shiny::tags$br()
+          ),
+
+          # Main panel for image inputs
+          mainPanel = shiny::mainPanel(
+
+            shiny::tags$div(
+              shiny::tags$b("Selected arena"),
+              shiny::imageOutput(
+                outputId = "input_cut_frame",
+                click = "arena_click",
+                brush = "arena_brush"
+              )
+            ),
+
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+
+
+            shiny::tags$div(
+              shiny::tags$b("Sliced arena"),
+              shinycssloaders::withSpinner(
+                shiny::imageOutput(
+                  outputId = "sliced_arena"
+                )
+              )
             )
+          )
+        )
+      ),
+
+      # Subject selection inner tab ---------------------------------------------
+      shiny::tabPanel(
+        title = "Subject settings",
+        shiny::sidebarLayout(
+          sidebarPanel = shiny::sidebarPanel(
+            width = 3,
+            shiny::tags$h3(
+              shiny::tags$em(
+                shiny::tags$strong(
+                  "Subject selection"
+                )
+              )
+            ),
+            shiny::tags$hr(),
+            # Copy the line below to make a set of radio buttons
+            shiny::radioButtons(
+              inputId = "subject_coord_radio",
+              label = shiny::tags$h3("Coord to select"),
+              choices = list("Top left" = 1, "Bottom right" = 2, "Area" = 3),
+              selected = 3
+            ),
+            shinycssloaders::withSpinner(
+              shiny::tableOutput(
+                "subject_coord_info"
+              )
+            ),
+            shiny::actionButton(
+              "cut_subject_button","Apply slice"
+            ),
+
+            shiny::actionButton(
+              "restart_subject_button", "Restart"
+            )
+          ),
+          # Main panel for image inputs
+          mainPanel = shiny::mainPanel(
+            shiny::tags$div(
+              shiny::tags$b("Selected subject"),
+              shinycssloaders::withSpinner(
+                shiny::imageOutput(
+                  outputId = "subject_select",
+                  click = "subject_click",
+                  brush = "subject_brush"
+                )
+              )
+            ),
+
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+            shiny::tags$br(),
+
+            shiny::tags$div(
+              shiny::tags$b("Sliced subject"),
+              shinycssloaders::withSpinner(
+                shiny::imageOutput(
+                  outputId = "sliced_subject"
+                )
+              )
+            )
+          )
+        )
+      ),
+      # Run Analysis inner tab ------------------------------------------
+      shiny::tabPanel(
+        title = "Run analysis",
+        shiny::sidebarLayout(
+          sidebarPanel = shiny::sidebarPanel(
+            width = 3,
+            shiny::tags$h3(
+              shiny::tags$em(
+                shiny::tags$strong(
+                  "Start analysis"
+                )
+              )
+            ),
+            shiny::actionButton(
+              inputId = "start_job_button",
+              label = shiny::tags$em(
+                shiny::tags$b(
+                  "Click to start analysis!"
+                )
+              ),
+              icon = shiny::icon("rocket")
+            )
+          ),
+          mainPanel = shiny::mainPanel(
+            shiny::textOutput("time_passed")
           )
         )
       )
     )
   ),
-
   # Analysis Panel ------------------------------------------------------
   shiny::tabPanel(
     title = "Summary statistics",
