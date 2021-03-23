@@ -228,7 +228,6 @@ ui <-  shiny::navbarPage(
           )
         )
       ),
-
       # Arena selection panel ------------------------------------------------
       shiny::tabPanel(
         title = "Arena settings",

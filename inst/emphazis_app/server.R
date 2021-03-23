@@ -56,6 +56,10 @@ server <- function(
   # Plots Panel
   react_values$max_frame_value <- NULL
 
+
+  message(fs::path_wd())
+
+
   # Upload files pane --------------------------------------------------------
 
   output$video_description <- shiny::renderTable({
@@ -276,16 +280,45 @@ server <- function(
     react_values$subject_slice_path <- NULL
   })
 
+  # Analysis timer -------------------------------------------------------
+  timer <- shiny::reactiveVal(0)
+  is_active_timer <- shiny::reactiveVal(FALSE)
+  output$time_passed <- shiny::renderText({
+    paste("Time passed:", lubridate::seconds_to_period(timer()))
+  })
+
+  shiny::observeEvent(input$start_job_button, {
+    message("Start timer")
+    is_active_timer(TRUE)
+  })
+
+  # observer that invalidates every second. If timer is active, increase by one.
+  shiny::observe({
+    shiny::invalidateLater(1000, session)
+    shiny::isolate({
+      if (is_active_timer()) {
+        timer(timer() + 1)
+        if (!is.null(react_values$metrics_table)) {
+          is_active_timer(FALSE)
+          shiny::showModal(
+            ui = shiny::modalDialog(
+              title = "Important message",
+              "Analysis completed!"
+            )
+          )
+        }
+      }
+    })
+  })
+
   # Analysis panel -------------------------------------------------------------
   shiny::observeEvent(input$start_job_button, {
 
     shiny::req(
       input$input_video,
-      input$fps_slider,
+      input$fps_slider
       # input$input_subject,
       # input$input_bg
-      react_values$arena_slice_path,
-      react_values$subject_slice_path,
     )
 
     message("Start analysis")
@@ -300,16 +333,23 @@ server <- function(
       react_values$arena_y2
     )
 
+    video_path <- input$input_video$datapath
+
+
     message("model start")
 
-    if (input$cv_method == "glm") {
+    if (input$analysis_method == "glm") {
+
+      shiny::req(
+        react_values$arena_slice_path,
+        react_values$subject_slice_path
+      )
+
       react_values$subject_model <- emphazis::generate_subject_model(
         subject_path = react_values$subject_slice_path,
         background_path = react_values$arena_slice_path
       )
       message("Model finished")
-
-      video_path <- input$input_video$datapath
 
       temp_frames_path <- fs::path_temp("frames")
       progressr::withProgressShiny(
@@ -330,15 +370,32 @@ server <- function(
       )
     }
 
-    if (input$cv_method == "yolo") {
-      react_values$position_table <- emphazis::proccess_video(
+    if (input$analysis_method == "yolo") {
+
+       frames_output_path <- emphazis::convert_video_to_image(
         video_path = video_path,
-        subject_model = "model_data",
-        frames_path = temp_frames_path,
-        coord1 = coord_1,
-        coord2 = coord_2,
-        fps = NULL,
-        method = "yolo"
+        frames_path = fs::path_temp("frame_1"),
+        fps = 0.2
+      )
+
+      react_values$first_frame_path <- frames_output_path[1]
+      react_values$arena_slice_path <- frames_output_path[1]
+
+      progressr::withProgressShiny(
+        message = "Calculation in progress",
+        detail = "This may take a while ...",
+        value = 0,
+        expr = {
+          react_values$position_table <- emphazis::proccess_video(
+            video_path = video_path,
+            subject_model = "model_data",
+            frames_path = temp_frames_path,
+            coord1 = coord_1,
+            coord2 = coord_2,
+            fps = NULL,
+            method = "yolo"
+          )
+        }
       )
     }
 
@@ -366,38 +423,6 @@ server <- function(
     # This is for plot frame slider
     react_values$max_frame_value <- max(react_values$metrics_table$frame)
   })
-
-
-
-  # Analysis timer ----------------------
-  timer <- shiny::reactiveVal(0)
-  is_active_timer <- shiny::reactiveVal(FALSE)
-  output$time_passed <- shiny::renderText({
-    paste("Time passed:", lubridate::seconds_to_period(timer()))
-  })
-  # observer that invalidates every second. If timer is active, increase by one.
-  shiny::observe({
-    shiny::invalidateLater(1000, session)
-    shiny::isolate({
-      if (is_active_timer()) {
-        timer(timer() + 1)
-        if (!is.null(react_values$metrics_table)) {
-          is_active_timer(FALSE)
-          shiny::showModal(
-            ui = shiny::modalDialog(
-              title = "Important message",
-              "Analysis completed!"
-            )
-          )
-        }
-      }
-    })
-  })
-
-  shiny::observeEvent(input$start_job_button, {
-    is_active_timer(TRUE)
-  })
-
 
   # ----------------------------------------------------------------------
   # CONVERSION RATES
