@@ -34,7 +34,6 @@ ui <-  shiny::navbarPage(
   title = "EmphaZis",
 
   theme = bslib::bs_theme(bootswatch = "flatly", version = 4),
-  # theme = shinythemes::shinytheme("flatly"),
 
   ### WELCOME PAGE ----
   shiny::tabPanel(
@@ -152,15 +151,43 @@ ui <-  shiny::navbarPage(
             )
           )
         ),
+
         shiny::tags$br(),
         # Video Input
         shiny::fileInput(
-          "input_video", "Choose Video File",
+          inputId = "input_video",
+          label = "Choose Video File",
           multiple = FALSE,
           accept = c("video/*")
         ),
         # Horizontal line ----
         shiny::tags$hr(),
+        # Select method
+        shiny::selectInput(
+          inputId = "analysis_method",
+          label = shiny::tags$h3(
+            shiny::tags$em("Select Analysis Method")
+          ),
+          choices = c(GLM = "glm", YOLO = "yolo"),
+          selected = "glm"
+        ),
+        shiny::tags$hr(),
+
+        # # GLM options
+        # shiny::conditionalPanel(
+        #   condition = "input.analysis_method == 'glm'",
+        #   shiny::selectInput(
+        #     "breaks", "Breaks",
+        #     c("Sturges", "Scott", "Freedman-Diaconis", "[Custom]" = "custom")
+        #   ),
+        #
+        #   # Only show this panel if yolo is selected
+        #   shiny::conditionalPanel(
+        #     condition = "input.analysis_method == 'yolo'",
+        #     shiny::sliderInput("breakCount", "Break Count", min = 1, max = 50, value = 10)
+        #   )
+        # ),
+
         shiny::sliderInput(
           inputId = "fps_slider",
           min = 1, max = 24, step = 1,
@@ -186,7 +213,6 @@ ui <-  shiny::navbarPage(
 
       # Main panel for image inputs
       mainPanel = shiny::mainPanel(
-
         shiny::tags$div(
           shiny::tags$b("Video decomposed frame"),
           shiny::tags$br(),
@@ -309,7 +335,6 @@ ui <-  shiny::navbarPage(
             )
           )
         ),
-
         shiny::actionButton(
           inputId = "start_job_button",
           label = shiny::tags$em(
@@ -453,7 +478,7 @@ ui <-  shiny::navbarPage(
     )
   ),
 
-  # 2D plots panel ------------------------------------------------------
+  # Plots panel set -----------------------------------------------------------
   shiny::tabPanel(
     title = "Plots",
     shiny::sidebarLayout(
@@ -489,70 +514,84 @@ ui <-  shiny::navbarPage(
         shiny::tags$br()
       ),
       mainPanel = shiny::mainPanel(
-        shiny::plotOutput(
-          "plot_track"
-        ) %>%
-          shiny::tagAppendAttributes(
-            alt = "Tracking Plot of the arena"
-          ) %>%
-          shinycssloaders::withSpinner(),
-        shiny::plotOutput(
-          "plot_track_heatmap"
-        ) %>%
-          shiny::tagAppendAttributes(
-            alt = "Heatmap plot of the arena"
-          ) %>%
-          shinycssloaders::withSpinner(),
-        shiny::plotOutput(
-          "plot_dist"
-        ) %>%
-          shiny::tagAppendAttributes(
-            alt = "Plot of cumulative distance"
-          ) %>%
-          shinycssloaders::withSpinner(),
-        shiny::plotOutput(
-          "plot_speed"
-        ) %>%
-          shiny::tagAppendAttributes(
-            alt = "Plot of rolling average speed by time"
-          ) %>%
-          shinycssloaders::withSpinner()
-      )
-    )
-  ),
+        shiny::tabsetPanel(
+          # 2D plots tab --------
+          shiny::tabPanel(
+            title = shiny::tags$h5(
+              shiny::tags$strong("2D-Plots")
+            ),
+            shiny::plotOutput(
+              "plot_track"
+            ) %>%
+              shiny::tagAppendAttributes(
+                alt = "Tracking Plot of the arena"
+              ) %>%
+              shinycssloaders::withSpinner(),
+            shiny::plotOutput(
+              "plot_track_heatmap"
+            ) %>%
+              shiny::tagAppendAttributes(
+                alt = "Heatmap plot of the arena"
+              ) %>%
+              shinycssloaders::withSpinner(),
+            shiny::plotOutput(
+              "plot_dist"
+            ) %>%
+              shiny::tagAppendAttributes(
+                alt = "Plot of cumulative distance"
+              ) %>%
+              shinycssloaders::withSpinner(),
+            shiny::plotOutput(
+              "plot_speed"
+            ) %>%
+              shiny::tagAppendAttributes(
+                alt = "Plot of rolling average speed by time"
+              ) %>%
+              shinycssloaders::withSpinner()
+          ),
 
-  # 3D plots panel ------------------------------------------------------
-  shiny::tabPanel(
-    title = "3D-Plots",
-    shiny::sidebarLayout(
-      sidebarPanel = shiny::sidebarPanel(
-        width = 3,
-        shiny::tags$h3(
-          shiny::tags$em(
-            shiny::tags$strong(
-              "Plot parameters"
-            )
+          shiny::tabPanel(
+            title = shiny::tags$h5(
+              shiny::tags$strong("3D-Plots")
+            ),
+            plotly::plotlyOutput(
+              "plot_3d_dots"
+            ) %>%
+              shinycssloaders::withSpinner(),
+            plotly::plotlyOutput(
+              "plot_3d_surface"
+            ) %>%
+              shinycssloaders::withSpinner(),
+            plotly::plotlyOutput(
+              "plot_3d_lines"
+            ) %>%
+              shinycssloaders::withSpinner()
           )
-        ),
-        shiny::tags$br()
-      ),
-      mainPanel = shiny::mainPanel(
-        plotly::plotlyOutput(
-          "plot_3d_dots"
-        ) %>%
-          shinycssloaders::withSpinner(),
-        plotly::plotlyOutput(
-          "plot_3d_surface"
-        ) %>%
-          shinycssloaders::withSpinner(),
-        plotly::plotlyOutput(
-          "plot_3d_lines"
-        ) %>%
-          shinycssloaders::withSpinner()
+        )
       )
     )
   ),
 
+#  # 3D plots panel ------------------------------------------------------
+#  shiny::tabPanel(
+#    title = "3D-Plots",
+#    shiny::sidebarLayout(
+#      sidebarPanel = shiny::sidebarPanel(
+#        width = 3,
+#        shiny::tags$h3(
+#          shiny::tags$em(
+#            shiny::tags$strong(
+#              "Plot parameters"
+#            )
+#          )
+#        ),
+#        shiny::tags$br()
+#      ),
+#      mainPanel = shiny::mainPanel(
+#      )
+#    )
+#  ),
+#
   # Quit button ---------------------------------------------------------
   shiny::navbarMenu(
     "Quit",
