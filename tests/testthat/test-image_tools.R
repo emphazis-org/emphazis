@@ -126,7 +126,7 @@ testthat::test_that("Full analysis with automated slices", {
   summary_test %>%
     dplyr::filter(var %in% "Number of frames") %>%
     dplyr::pull("value") %>%
-    testthat::expect_equal(46)
+    testthat::expect_equal(50)
 
   plot_test_x <- plot_track(calculate_metrics(frames_output_test))
   testthat::expect_s3_class(plot_test_x, "ggplot")

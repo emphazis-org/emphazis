@@ -4,11 +4,11 @@
 \name{emphazis-package}
 \alias{emphazis}
 \alias{emphazis-package}
-\title{emphazis: Emphazis}
+\title{emphazis: Emphazis - Zebrafish tracking made simple}
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
-More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Computational vision tracking tailored for zebrafish
+    tracking studies.
 }
 \keyword{internal}

@@ -35,6 +35,8 @@ ADD . /build_zone
 WORKDIR /build_zone
 # RUN R -e 'remotes::install_local(upgrade="never")'
 
+RUN Rscript -e 'remotes::install_github("emphazis-org/emphaziscv@main", upgrade="never")'
+
 RUN Rscript -e 'remotes::install_github("emphazis-org/emphazis@main", upgrade="never")'
 
 # RUN Rscript -e 'remotes::install_github("emphazis-org/shinyemphazis@main", upgrade="never")'

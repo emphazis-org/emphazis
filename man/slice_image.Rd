@@ -11,9 +11,9 @@ slice_image(image_path, output_path, coord1 = NULL, coord2 = NULL)
 
 \item{output_path}{Path to save sliced image.}
 
-\item{coord1}{length 2 vector with position of the top left point.}
+\item{coord1}{Length 2 vector with position of the top left point.}
 
-\item{coord2}{length 2 vector with position of the bottom right point.}
+\item{coord2}{Length 2 vector with position of the bottom right point.}
 }
 \description{
 Slice image with given X and Y coordinates.

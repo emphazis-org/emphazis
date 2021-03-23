@@ -10,21 +10,25 @@ proccess_video(
   frames_path,
   coord1 = NULL,
   coord2 = NULL,
-  fps = 5
+  fps = 5,
+  method = "glm"
 )
 }
 \arguments{
 \item{video_path}{Path to video file.}
 
-\item{subject_model}{model generated from \code{generate_subject_model()}.}
+\item{subject_model}{Model generated from \code{generate_subject_model()},
+or path to folder with model files.}
 
 \item{frames_path}{Path to save frames extracted from video.}
 
-\item{coord1}{length 2 vector with position of the top left point.}
+\item{coord1}{Length 2 vector with position of the top left point.}
 
-\item{coord2}{length 2 vector with position of the bottom right point.}
+\item{coord2}{Length 2 vector with position of the bottom right point.}
 
 \item{fps}{default = 5; Frames per second to decompose video.}
+
+\item{method}{Default}
 }
 \description{
 Extract data and frames from video.

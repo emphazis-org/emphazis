@@ -282,6 +282,7 @@ server <- function(
     shiny::req(
       input$input_video,
       input$fps_slider,
+      input$cv_method,
       # input$input_subject,
       # input$input_bg
       react_values$arena_slice_path,
@@ -302,30 +303,45 @@ server <- function(
 
     message("model start")
 
-    react_values$subject_model <- emphazis::generate_subject_model(
-      subject_path = react_values$subject_slice_path,
-      background_path = react_values$arena_slice_path
-    )
-    message("Model finished")
+    if (input$cv_method == "glm") {
+      react_values$subject_model <- emphazis::generate_subject_model(
+        subject_path = react_values$subject_slice_path,
+        background_path = react_values$arena_slice_path
+      )
+      message("Model finished")
 
-    video_path <- input$input_video$datapath
+      video_path <- input$input_video$datapath
 
-    temp_frames_path <- fs::path_temp("frames")
-    progressr::withProgressShiny(
-      message = "Calculation in progress",
-      detail = "This may take a while ...",
-      value = 0,
-      expr = {
-        react_values$position_table <- emphazis::proccess_video(
-          video_path = video_path,
-          subject_model = react_values$subject_model,
-          frames_path = temp_frames_path,
-          coord1 = coord_1,
-          coord2 = coord_2,
-          fps = input$fps_slider
-        )
-      }
-    )
+      temp_frames_path <- fs::path_temp("frames")
+      progressr::withProgressShiny(
+        message = "Calculation in progress",
+        detail = "This may take a while ...",
+        value = 0,
+        expr = {
+          react_values$position_table <- emphazis::proccess_video(
+            video_path = video_path,
+            subject_model = react_values$subject_model,
+            frames_path = temp_frames_path,
+            coord1 = coord_1,
+            coord2 = coord_2,
+            fps = input$fps_slider,
+            method = "glm"
+          )
+        }
+      )
+    }
+
+    if (input$cv_method == "yolo") {
+      react_values$position_table <- emphazis::proccess_video(
+        video_path = video_path,
+        subject_model = "model_data",
+        frames_path = temp_frames_path,
+        coord1 = coord_1,
+        coord2 = coord_2,
+        fps = NULL,
+        method = "yolo"
+      )
+    }
 
     # TODO remove test infrastructure
     # print(react_values$position_table)
