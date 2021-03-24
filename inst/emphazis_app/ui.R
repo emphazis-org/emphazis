@@ -4,11 +4,11 @@
 
 pkg_deps <- c(
   "shiny",
-  # "shinythemes",
   "bslib",
   "thematic",
   "shinycssloaders",
   "colourpicker",
+  "lubridate",
   "metathis"
 )
 
