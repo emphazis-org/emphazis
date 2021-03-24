@@ -337,7 +337,7 @@ server <- function(
 
 
     message("model start")
-
+    tictoc::tic("Video process")
     if (input$analysis_method == "glm") {
 
       shiny::req(
@@ -403,6 +403,7 @@ server <- function(
     # print(react_values$position_table)
     # str(react_values$position_table)
     message("Video finished")
+    tictoc::toc()
   })
 
 
