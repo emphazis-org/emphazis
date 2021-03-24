@@ -171,7 +171,7 @@ ui <-  shiny::navbarPage(
               label = shiny::tags$h3(
                 shiny::tags$em("Select Analysis Method")
               ),
-              choices = c(GLM = "glm", YOLO = "yolo"),
+              choices = c(GLM = "glm", `Neural Network` = "yolo"),
               selected = "glm"
             ),
             shiny::tags$hr(),
