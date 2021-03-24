@@ -57,8 +57,8 @@ server <- function(
   react_values$max_frame_value <- NULL
 
 
-  message(fs::path_wd())
-
+  message(paste("Working on:", fs::path_wd()))
+  message(paste("Session start at:", Sys.time()))
 
   # Upload files pane --------------------------------------------------------
 
